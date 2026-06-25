@@ -3,18 +3,10 @@
   "buildCommand": "echo 'no build needed'",
   "outputDirectory": "public",
   "functions": {
-    "api/*.js": {
-      "maxDuration": 30
-    }
+    "api/*.js": { "maxDuration": 30 }
   },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
