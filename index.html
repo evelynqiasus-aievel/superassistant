@@ -313,6 +313,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
       <div class="nav-item" onclick="nav('briefing',this)">
         <i class="ti ti-sun"></i>Daily Briefing
       </div>
+      <div class="nav-item" onclick="nav('va',this)">
+        <i class="ti ti-user-check"></i>VA Tasks
+      </div>
+      <div class="nav-item fun-nav-item" onclick="nav('fun',this)">
+        <i class="ti ti-confetti"></i>Fun Break
+      </div>
     </div>
 
     <div class="sidebar-label">Workspaces</div>
@@ -381,6 +387,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         </button>
         <button class="icon-btn" aria-label="Calendar" onclick="showNotif('Calendar coming in Phase 2')">
           <i class="ti ti-calendar"></i>
+        </button>
+        <button class="todo-trigger-btn" id="todo-trigger" onclick="openTodo()" aria-label="Open daily to-do list">
+          <i class="ti ti-checkbox"></i>
+          <span>My Day</span>
+          <span class="todo-count-badge" id="todo-count-badge">0</span>
         </button>
         <button class="avatar" aria-label="Profile">EV</button>
       </div>
@@ -852,13 +863,427 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         </div>
       </div>
 
+      <!-- ─────────────── VA RECOMMENDATIONS ─────────────── -->
+      <div class="page" id="page-va">
+        <div class="va-page-header">
+          <div>
+            <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">VA Recommendations</h1>
+            <p style="font-size:13px;color:var(--text-secondary)">AI-generated task briefs your VA can action right now — with full context, instructions, and expected output.</p>
+          </div>
+          <button class="va-generate-btn" id="va-gen-btn" onclick="generateVATasks()">
+            <i class="ti ti-sparkles"></i>Generate VA Brief
+          </button>
+        </div>
+
+        <!-- Summary bar -->
+        <div class="va-summary-bar">
+          <div class="va-summary-stat">
+            <div class="va-summary-num" id="va-stat-total">6</div>
+            <div class="va-summary-label">Tasks ready</div>
+          </div>
+          <div class="va-summary-divider"></div>
+          <div class="va-summary-stat">
+            <div class="va-summary-num" style="color:var(--danger)" id="va-stat-urgent">2</div>
+            <div class="va-summary-label">Due today</div>
+          </div>
+          <div class="va-summary-divider"></div>
+          <div class="va-summary-stat">
+            <div class="va-summary-num" style="color:var(--info)" id="va-stat-hrs">5.5</div>
+            <div class="va-summary-label">Est. hours</div>
+          </div>
+          <div class="va-summary-divider"></div>
+          <div class="va-summary-stat">
+            <div class="va-summary-num" style="color:var(--success)" id="va-stat-done">1</div>
+            <div class="va-summary-label">Completed</div>
+          </div>
+          <div style="flex:1"></div>
+          <button class="va-copy-all-btn" onclick="copyAllBrief()"><i class="ti ti-copy"></i>Copy all briefs</button>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="va-filter-row">
+          <div class="va-chip active" onclick="vaFilter(this,'all')">All tasks</div>
+          <div class="va-chip" onclick="vaFilter(this,'today')"><i class="ti ti-flame"></i>Due today</div>
+          <div class="va-chip" onclick="vaFilter(this,'comms')"><i class="ti ti-mail"></i>Comms</div>
+          <div class="va-chip" onclick="vaFilter(this,'admin')"><i class="ti ti-file-text"></i>Admin</div>
+          <div class="va-chip" onclick="vaFilter(this,'research')"><i class="ti ti-search"></i>Research</div>
+          <div class="va-chip" onclick="vaFilter(this,'content')"><i class="ti ti-pencil"></i>Content</div>
+        </div>
+
+        <!-- Task cards -->
+        <div id="va-task-list">
+
+          <div class="va-card" data-cat="comms" data-due="today">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:#E6F0FB;color:#1A5CA8"><i class="ti ti-mail"></i></div>
+                <div>
+                  <div class="va-card-title">Draft follow-up emails — MOA+ client review</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#E6F0FB;color:#1A5CA8">Comms</span>
+                    <span class="va-due-tag va-due-today"><i class="ti ti-flame"></i>Due today</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>45 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+                <div class="va-brief-text">Write and send follow-up emails to the 3 clients who attended yesterday's MOA+ client review meeting. Each email should thank them for their time, summarise the key points discussed, and confirm the next steps agreed in the meeting.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+                <div class="va-brief-text">Meeting transcript from June 25 MOA+ Client Review is saved in CEO Brain. Clients: TechNova Sdn Bhd (Sarah Lim), Pinnacle Group (James Tan), Harvest Digital (Rachel Ng). Tone: professional, warm, concise.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+                <div class="va-brief-text">3 separate email drafts sent to Evelyn for approval before 3pm, or sent directly if Evelyn has pre-approved the template. CC Evelyn on all.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-alert-circle"></i>Important notes</div>
+                <div class="va-brief-text">Do not promise specific timelines that were not mentioned in the meeting. If unsure about any next step, leave a placeholder and flag for Evelyn to fill in.</div>
+              </div>
+              <div class="va-brief-actions">
+                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="va-card" data-cat="admin" data-due="today">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:#FBF3E3;color:#7A500D"><i class="ti ti-notes"></i></div>
+                <div>
+                  <div class="va-card-title">Compile Lonza workshop meeting notes</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#FBF3E3;color:#7A500D">Admin</span>
+                    <span class="va-due-tag va-due-today"><i class="ti ti-flame"></i>Due today</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>30 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+                <div class="va-brief-text">Create a clean, formatted meeting summary from the Lonza Workshop Kickoff transcript (June 24). Extract key decisions, action items with owners and deadlines, and open risks. Format as a shareable PDF or Google Doc.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+                <div class="va-brief-text">Transcript is in CEO Brain under "Lonza Workshop Kickoff — June 24". Attendees: Evelyn, Lonza HR lead (Maria Santos), workshop facilitator (David Koh), operations contact. Format: use the standard meeting notes template in the Shared Drive → Templates folder.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+                <div class="va-brief-text">One-page meeting summary document sent to all attendees by 5pm today. Email subject: "Lonza Workshop Kickoff — Notes &amp; Next Steps (June 24)". BCC Evelyn.</div>
+              </div>
+              <div class="va-brief-actions">
+                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="va-card" data-cat="research" data-due="week">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:#EBF5EF;color:#1A5E38"><i class="ti ti-search"></i></div>
+                <div>
+                  <div class="va-card-title">Research 5 podcast guest candidates</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#EBF5EF;color:#1A5E38">Research</span>
+                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Friday</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>2 hrs</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+                <div class="va-brief-text">Identify and profile 5 potential podcast guests for Evelyn's upcoming podcast. Focus on women in leadership, entrepreneurship, and education. For each, provide: name, current role, LinkedIn URL, why they'd be a great fit, and suggested episode angle.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+                <div class="va-brief-text">Podcast target audience: ambitious women building businesses and careers in Southeast Asia. Guest criteria discussed in Personal Brand Strategy meeting (June 18) — notes in CEO Brain. Preferred profile: published author or speaker, 5,000+ LinkedIn followers, based in SEA or with SEA relevance.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+                <div class="va-brief-text">A Google Sheet with 5 rows (one per guest) and columns: Name, Role, Company, LinkedIn, Why them, Episode angle, Contact email (if findable). Share link with Evelyn by Friday 5pm.</div>
+              </div>
+              <div class="va-brief-actions">
+                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="va-card" data-cat="admin" data-due="week">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:#F3F0FB;color:#4A35A0"><i class="ti ti-folder"></i></div>
+                <div>
+                  <div class="va-card-title">Reorganize One Life Google Drive folder</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#F3F0FB;color:#4A35A0">Admin</span>
+                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Friday</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>60 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+                <div class="va-brief-text">Restructure the One Life folder in Google Drive following the approved naming convention SOP. Archive outdated files (anything older than Dec 2024 that is not a template or SOP). Create clearly labelled subfolders for: Clients, Events, Venue, Marketing, Finance, Proposals.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+                <div class="va-brief-text">Drive folder: Shared Drive → One Life. Naming convention SOP is at Shared Drive → SOPs → "File Naming &amp; Folder Structure SOP v2". Do not delete anything — move to "_Archive (2024 and before)" subfolder. Flag any files you're unsure about.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+                <div class="va-brief-text">Reorganised folder with a screenshot summary of the new structure sent to Evelyn via WhatsApp or email. Note any files flagged for her decision.</div>
+              </div>
+              <div class="va-brief-actions">
+                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="va-card" data-cat="content" data-due="week">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:#FBEAEA;color:#8A2020"><i class="ti ti-pencil"></i></div>
+                <div>
+                  <div class="va-card-title">Create October workshop social media posts</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#FBEAEA;color:#8A2020">Content</span>
+                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Wednesday</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>90 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+                <div class="va-brief-text">Write 8 social media posts promoting Evelyn's October leadership workshops. Mix of announcement, testimonial, behind-the-scenes, and value-focused posts. 4 for LinkedIn (longer, professional), 4 for Instagram (shorter, punchy with emoji). Include a CTA and registration link placeholder in each.</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+                <div class="va-brief-text">Workshop details: Oct 14–15, leadership focus, in-person, targeted at corporate managers and team leads. Past post examples in Shared Drive → Marketing → Social Media → 2025 Archive. Evelyn's writing style guide is at Shared Drive → Brand → "Evelyn Voice &amp; Tone Guide".</div>
+              </div>
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+                <div class="va-brief-text">8 ready-to-post captions in a Google Doc, labelled by platform and post number. Include suggested hashtags for each. Share for Evelyn's review by Wednesday noon. Do not post without approval.</div>
+              </div>
+              <div class="va-brief-actions">
+                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="va-card va-card-done" data-cat="comms" data-due="done">
+            <div class="va-card-header">
+              <div class="va-card-left">
+                <div class="va-card-icon" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i></div>
+                <div>
+                  <div class="va-card-title" style="text-decoration:line-through;color:var(--text-muted)">Reply to One Haven partnership inquiry</div>
+                  <div class="va-card-meta">
+                    <span class="va-cat-tag" style="background:#E6F0FB;color:#1A5CA8">Comms</span>
+                    <span class="va-due-tag" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i>Completed</span>
+                    <span class="va-time-tag"><i class="ti ti-clock"></i>20 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="va-card-actions">
+                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
+              </div>
+            </div>
+            <div class="va-card-body">
+              <div class="va-brief-section">
+                <div class="va-brief-label"><i class="ti ti-target"></i>What was done</div>
+                <div class="va-brief-text">Drafted and sent acknowledgment reply to One Haven's partnership inquiry received June 23. Confirmed Evelyn's interest and requested a 30-minute discovery call for early July. Completed June 26, 9:15am.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Add custom VA task -->
+        <div class="va-add-task-wrap">
+          <div class="va-add-task-header">
+            <i class="ti ti-plus-circle" style="color:var(--accent)"></i>
+            <span>Add a custom VA task</span>
+          </div>
+          <div class="va-add-task-row">
+            <input class="va-add-input" id="va-add-input" placeholder="Describe what you want your VA to do…" maxlength="200">
+            <select class="va-add-cat-sel" id="va-add-cat" aria-label="Category">
+              <option value="admin">Admin</option>
+              <option value="comms">Comms</option>
+              <option value="research">Research</option>
+              <option value="content">Content</option>
+            </select>
+            <button class="va-add-submit" onclick="addVaTask()"><i class="ti ti-sparkles"></i>Generate brief</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─────────────── FUN BREAK ─────────────── -->
+      <div class="page" id="page-fun">
+
+        <div class="fun-hero">
+          <div class="fun-hero-emoji" id="fun-emoji">🎉</div>
+          <div class="fun-hero-title">You deserve a break, Evelyn.</div>
+          <div class="fun-hero-sub">You've been working hard. This tab exists to remind you that joy is part of the job.</div>
+          <div class="fun-mood-row">
+            <div class="fun-mood-chip active" onclick="setMood(this,'energised','⚡')">⚡ Energised</div>
+            <div class="fun-mood-chip" onclick="setMood(this,'calm','🌿')">🌿 Need calm</div>
+            <div class="fun-mood-chip" onclick="setMood(this,'playful','😄')">😄 Playful</div>
+            <div class="fun-mood-chip" onclick="setMood(this,'inspired','✨')">✨ Inspired</div>
+            <div class="fun-mood-chip" onclick="setMood(this,'tired','😴')">😴 Tired</div>
+          </div>
+        </div>
+
+        <div class="fun-grid">
+
+          <!-- Break timer -->
+          <div class="fun-card fun-card-dark">
+            <div class="fun-card-label">Break timer</div>
+            <div class="fun-timer-display" id="fun-timer">05:00</div>
+            <div class="fun-timer-btns">
+              <button class="fun-timer-preset" onclick="setTimer(5)">5 min</button>
+              <button class="fun-timer-preset" onclick="setTimer(10)">10 min</button>
+              <button class="fun-timer-preset" onclick="setTimer(15)">15 min</button>
+            </div>
+            <div class="fun-timer-controls">
+              <button class="fun-ctrl-btn" id="fun-timer-btn" onclick="toggleTimer()"><i class="ti ti-player-play"></i>Start break</button>
+              <button class="fun-ctrl-btn fun-ctrl-ghost" onclick="resetTimer()"><i class="ti ti-refresh"></i></button>
+            </div>
+          </div>
+
+          <!-- Mood quote -->
+          <div class="fun-card" id="fun-quote-card">
+            <div class="fun-card-label">Your moment</div>
+            <div class="fun-quote-text" id="fun-quote">"The most productive thing you can do is rest."</div>
+            <div class="fun-quote-author" id="fun-quote-author">— Alex Soojung-Kim Pang</div>
+            <button class="fun-refresh-quote" onclick="refreshQuote()"><i class="ti ti-refresh"></i>New quote</button>
+          </div>
+
+          <!-- Joy checklist -->
+          <div class="fun-card">
+            <div class="fun-card-label">Joy checklist · today</div>
+            <div class="fun-joy-list" id="fun-joy-list">
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Had water in the last hour</span>
+              </div>
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Stepped away from screen</span>
+              </div>
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Had something that made me smile</span>
+              </div>
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Ate a proper meal</span>
+              </div>
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Talked to someone I like today</span>
+              </div>
+              <div class="fun-joy-item" onclick="toggleJoy(this)">
+                <div class="fun-joy-check"><i class="ti ti-check"></i></div>
+                <span>Did something just for me</span>
+              </div>
+            </div>
+            <div class="fun-joy-score" id="fun-joy-score">0 of 6 — let's get one going ✨</div>
+          </div>
+
+          <!-- Fun recommendation -->
+          <div class="fun-card fun-card-accent" id="fun-rec-card">
+            <div class="fun-card-label" style="color:var(--accent-text)">Evelyn recommends right now</div>
+            <div class="fun-rec-emoji" id="fun-rec-emoji">🎵</div>
+            <div class="fun-rec-title" id="fun-rec-title">Put on a song you love</div>
+            <div class="fun-rec-desc" id="fun-rec-desc">Close your eyes for one track. Let your brain reset before your next meeting.</div>
+            <button class="fun-rec-btn" onclick="nextRec()">Show me another <i class="ti ti-arrow-right"></i></button>
+          </div>
+
+          <!-- Micro wins -->
+          <div class="fun-card">
+            <div class="fun-card-label">Micro wins today 🏆</div>
+            <div id="fun-wins-list">
+              <div class="fun-win-item"><i class="ti ti-trophy" style="color:var(--accent)"></i><span>Approved the Lonza proposal</span></div>
+              <div class="fun-win-item"><i class="ti ti-trophy" style="color:var(--accent)"></i><span>Replied to One Haven inquiry</span></div>
+            </div>
+            <div class="fun-win-add-row">
+              <input class="fun-win-input" id="fun-win-input" placeholder="Add a win, big or small…" maxlength="80">
+              <button class="fun-win-add-btn" onclick="addWin()"><i class="ti ti-plus"></i></button>
+            </div>
+          </div>
+
+          <!-- Fun challenge -->
+          <div class="fun-card fun-card-dark">
+            <div class="fun-card-label">Today's fun challenge</div>
+            <div class="fun-challenge-emoji" id="fun-ch-emoji">🚶</div>
+            <div class="fun-challenge-text" id="fun-ch-text">Take a 10-minute walk outside before your next meeting. No phone.</div>
+            <div class="fun-challenge-actions">
+              <button class="fun-ctrl-btn" onclick="completeChallenge(this)"><i class="ti ti-check"></i>Done it!</button>
+              <button class="fun-ctrl-btn fun-ctrl-ghost" onclick="nextChallenge()"><i class="ti ti-refresh"></i>New one</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Confetti canvas -->
+        <canvas id="fun-confetti" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;display:none"></canvas>
+
+      </div>
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
 
 <script>
 // ─── Navigation ───────────────────────────────────────────────
-const pages = ['dashboard','brain','delegate','rescue','meetings','briefing'];
+const pages = ['dashboard','brain','delegate','rescue','meetings','briefing','va','fun'];
 
 function nav(id, el) {
   pages.forEach(p => {
@@ -1094,6 +1519,961 @@ function checkMobile() {
 }
 checkMobile();
 window.addEventListener('resize', checkMobile);
+</script>
+
+<!-- ═══════════════════════════════ VA PAGE STYLES ═══════════════════════════════ -->
+<style>
+/* ── VA page header ── */
+.va-page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px}
+.va-generate-btn{background:var(--sidebar-bg);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.va-generate-btn:hover:not(:disabled){background:#1A1A16}
+.va-generate-btn:disabled{opacity:.6;cursor:not-allowed}
+
+/* ── Summary bar ── */
+.va-summary-bar{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:0}
+.va-summary-stat{text-align:center;padding:0 20px}
+.va-summary-num{font-size:22px;font-weight:500;color:var(--text-primary);line-height:1}
+.va-summary-label{font-size:11px;color:var(--text-muted);margin-top:3px}
+.va-summary-divider{width:.5px;height:36px;background:var(--border);flex-shrink:0}
+.va-copy-all-btn{background:transparent;border:.5px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:all .1s}
+.va-copy-all-btn:hover{background:var(--bg);color:var(--text-primary)}
+
+/* ── Filter chips ── */
+.va-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.va-chip{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;color:var(--text-secondary);background:var(--card-bg);border:.5px solid var(--border);cursor:pointer;transition:all .1s;user-select:none}
+.va-chip i{font-size:13px}
+.va-chip:hover{border-color:var(--accent);color:var(--accent-text)}
+.va-chip.active{background:var(--sidebar-bg);color:#fff;border-color:transparent}
+
+/* ── VA task card ── */
+.va-card{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.va-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.va-card.va-card-done{opacity:.7}
+.va-card.hidden{display:none}
+
+.va-card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:12px;cursor:pointer}
+.va-card-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.va-card-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.va-card-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:5px}
+.va-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.va-cat-tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.va-due-tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:flex;align-items:center;gap:3px}
+.va-due-today{background:var(--danger-bg);color:var(--danger)}
+.va-due-week{background:var(--warning-bg);color:var(--warning)}
+.va-time-tag{font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:3px}
+.va-time-tag i{font-size:11px}
+
+.va-card-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.va-status-btn{font-size:11px;font-weight:500;padding:5px 10px;border-radius:5px;border:.5px solid var(--success);color:var(--success);background:transparent;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;transition:all .1s;white-space:nowrap}
+.va-status-btn:hover{background:var(--success-bg)}
+.va-status-btn.done-btn{background:var(--success-bg);color:var(--success);border-color:transparent;cursor:default}
+.va-copy-btn,.va-expand-btn{width:28px;height:28px;border:.5px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-muted);transition:all .1s}
+.va-copy-btn:hover,.va-expand-btn:hover{background:var(--bg);color:var(--text-primary)}
+.va-expand-btn.open i{transform:rotate(180deg)}
+.va-expand-btn i{transition:transform .2s}
+
+/* ── Card body (expandable) ── */
+.va-card-body{display:none;padding:0 16px 16px;border-top:.5px solid var(--border)}
+.va-card-body.open{display:block}
+.va-brief-section{margin-top:14px}
+.va-brief-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.va-brief-label i{font-size:13px;color:var(--accent)}
+.va-brief-text{font-size:13px;color:var(--text-secondary);line-height:1.7;background:var(--bg);padding:10px 12px;border-radius:6px;border-left:2px solid var(--accent)}
+.va-brief-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.va-brief-action{font-size:12px;font-weight:500;padding:7px 14px;border-radius:6px;border:.5px solid var(--border);background:transparent;cursor:pointer;font-family:var(--font);color:var(--text-secondary);display:flex;align-items:center;gap:5px;transition:all .1s}
+.va-brief-action:hover{background:var(--sidebar-bg);color:#fff;border-color:transparent}
+
+/* ── Add custom task ── */
+.va-add-task-wrap{background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:16px;margin-top:8px;margin-bottom:20px}
+.va-add-task-header{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--accent-text);margin-bottom:12px}
+.va-add-task-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.va-add-input{flex:1;min-width:200px;height:36px;padding:0 12px;border:.5px solid #E8C97A;border-radius:7px;font-size:13px;font-family:var(--font);color:var(--text-primary);background:#fff;outline:none}
+.va-add-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(198,139,42,.15)}
+.va-add-input::placeholder{color:var(--text-muted)}
+.va-add-cat-sel{height:36px;border:.5px solid #E8C97A;border-radius:7px;font-size:12px;font-family:var(--font);color:var(--text-secondary);background:#fff;padding:0 10px;outline:none;cursor:pointer}
+.va-add-submit{height:36px;padding:0 16px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:background .15s;white-space:nowrap}
+.va-add-submit:hover{background:#B07A22}
+</style>
+
+<!-- ═══════════════════════════════ VA PAGE JS ═══════════════════════════════ -->
+<script>
+// ─── VA Page ───────────────────────────────────────────────────
+function toggleVaCard(btn) {
+  const card = btn.closest('.va-card');
+  const body = card.querySelector('.va-card-body');
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+function markVaDone(btn) {
+  const card = btn.closest('.va-card');
+  card.classList.add('va-card-done');
+  btn.innerHTML = '<i class="ti ti-check"></i>Done';
+  btn.classList.add('done-btn');
+  btn.disabled = true;
+  const title = card.querySelector('.va-card-title');
+  title.style.textDecoration = 'line-through';
+  title.style.color = 'var(--text-muted)';
+  const doneTag = card.querySelector('.va-due-tag');
+  if (doneTag) {
+    doneTag.className = 'va-due-tag';
+    doneTag.style.background = 'var(--success-bg)';
+    doneTag.style.color = 'var(--success)';
+    doneTag.innerHTML = '<i class="ti ti-check"></i>Completed';
+  }
+  // update stat
+  const doneEl = document.getElementById('va-stat-done');
+  if (doneEl) doneEl.textContent = parseInt(doneEl.textContent) + 1;
+  showNotif('VA task marked as done');
+}
+
+function copyBrief(btn) {
+  const card = btn.closest('.va-card');
+  const title = card.querySelector('.va-card-title').textContent;
+  const sections = card.querySelectorAll('.va-brief-section');
+  let text = `VA TASK BRIEF: ${title}\n\n`;
+  sections.forEach(s => {
+    const label = s.querySelector('.va-brief-label').textContent.trim();
+    const content = s.querySelector('.va-brief-text').textContent.trim();
+    text += `${label}\n${content}\n\n`;
+  });
+  navigator.clipboard.writeText(text).catch(() => {});
+  showNotif('Brief copied to clipboard');
+}
+
+function copyAllBrief() {
+  const cards = document.querySelectorAll('#va-task-list .va-card:not(.va-card-done)');
+  let text = `VA TASK BRIEFS — ${new Date().toDateString()}\n${'='.repeat(50)}\n\n`;
+  cards.forEach((card, i) => {
+    const title = card.querySelector('.va-card-title').textContent;
+    text += `${i + 1}. ${title}\n`;
+    card.querySelectorAll('.va-brief-section').forEach(s => {
+      const label = s.querySelector('.va-brief-label').textContent.trim();
+      const content = s.querySelector('.va-brief-text').textContent.trim();
+      text += `   ${label}: ${content}\n`;
+    });
+    text += '\n';
+  });
+  navigator.clipboard.writeText(text).catch(() => {});
+  showNotif('All briefs copied — ready to paste to VA');
+}
+
+function vaFilter(chip, filter) {
+  document.querySelectorAll('.va-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  const cards = document.querySelectorAll('#va-task-list .va-card');
+  cards.forEach(card => {
+    if (filter === 'all') {
+      card.classList.remove('hidden');
+    } else if (filter === 'today') {
+      card.classList.toggle('hidden', card.dataset.due !== 'today');
+    } else {
+      card.classList.toggle('hidden', card.dataset.cat !== filter);
+    }
+  });
+}
+
+let vaTaskCount = 6;
+function addVaTask() {
+  const input = document.getElementById('va-add-input');
+  const cat = document.getElementById('va-add-cat').value;
+  const desc = input.value.trim();
+  if (!desc) { input.focus(); return; }
+
+  const btn = document.querySelector('.va-add-submit');
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Generating…';
+  btn.disabled = true;
+
+  const catMeta = {
+    admin:    { label:'Admin',    bg:'#FBF3E3', color:'#7A500D', icon:'ti-file-text' },
+    comms:    { label:'Comms',    bg:'#E6F0FB', color:'#1A5CA8', icon:'ti-mail' },
+    research: { label:'Research', bg:'#EBF5EF', color:'#1A5E38', icon:'ti-search' },
+    content:  { label:'Content',  bg:'#FBEAEA', color:'#8A2020', icon:'ti-pencil' },
+  };
+  const m = catMeta[cat];
+
+  setTimeout(() => {
+    btn.innerHTML = '<i class="ti ti-sparkles"></i>Generate brief';
+    btn.disabled = false;
+    input.value = '';
+
+    const newCard = document.createElement('div');
+    newCard.className = 'va-card';
+    newCard.dataset.cat = cat;
+    newCard.dataset.due = 'week';
+    newCard.innerHTML = `
+      <div class="va-card-header">
+        <div class="va-card-left">
+          <div class="va-card-icon" style="background:${m.bg};color:${m.color}"><i class="ti ${m.icon}"></i></div>
+          <div>
+            <div class="va-card-title">${escHtml(desc)}</div>
+            <div class="va-card-meta">
+              <span class="va-cat-tag" style="background:${m.bg};color:${m.color}">${m.label}</span>
+              <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>This week</span>
+              <span class="va-time-tag"><i class="ti ti-clock"></i>TBD</span>
+            </div>
+          </div>
+        </div>
+        <div class="va-card-actions">
+          <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
+          <button class="va-copy-btn" onclick="copyBrief(this)"><i class="ti ti-copy"></i></button>
+          <button class="va-expand-btn open" onclick="toggleVaCard(this)"><i class="ti ti-chevron-down"></i></button>
+        </div>
+      </div>
+      <div class="va-card-body open">
+        <div class="va-brief-section">
+          <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
+          <div class="va-brief-text">${escHtml(desc)}. Complete this task to the best of your ability using the available resources and report back with results or any blockers.</div>
+        </div>
+        <div class="va-brief-section">
+          <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
+          <div class="va-brief-text">Refer to relevant files in the Shared Drive and past meeting notes in CEO Brain. If additional context is needed, message Evelyn before proceeding.</div>
+        </div>
+        <div class="va-brief-section">
+          <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
+          <div class="va-brief-text">Completed task with a brief summary sent to Evelyn confirming what was done, any decisions made, and anything that requires her follow-up.</div>
+        </div>
+        <div class="va-brief-actions">
+          <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
+          <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
+        </div>
+      </div>`;
+
+    const list = document.getElementById('va-task-list');
+    const addWrap = document.querySelector('.va-add-task-wrap');
+    list.insertBefore(newCard, addWrap);
+    vaTaskCount++;
+    document.getElementById('va-stat-total').textContent = vaTaskCount;
+    showNotif('VA brief generated and added');
+  }, 1000);
+}
+
+function generateVATasks() {
+  const btn = document.getElementById('va-gen-btn');
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Analysing tasks…';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<i class="ti ti-check"></i>Brief ready';
+    btn.style.background = '#1A4A1E';
+    showNotif('VA brief refreshed from latest meetings');
+    setTimeout(() => {
+      btn.innerHTML = '<i class="ti ti-sparkles"></i>Generate VA Brief';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  }, 1400);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+
+<!-- ═══════════════════════════════ FUN BREAK STYLES ═══════════════════════════════ -->
+<style>
+/* ── Sidebar fun item ── */
+.fun-nav-item{color:#C68B2A !important}
+.fun-nav-item:hover{background:#1E1A10 !important;color:#E8B84B !important}
+.fun-nav-item.active{background:#1E1A10 !important;color:#E8B84B !important}
+
+/* ── Hero ── */
+.fun-hero{background:linear-gradient(135deg,#0E0E0C 0%,#1E1A10 60%,#2A1E08 100%);border-radius:var(--radius);padding:32px 28px;margin-bottom:20px;text-align:center}
+.fun-hero-emoji{font-size:48px;margin-bottom:12px;display:block;animation:fun-pulse 2.5s ease-in-out infinite}
+@keyframes fun-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.fun-hero-title{font-size:20px;font-weight:500;color:#fff;margin-bottom:6px}
+.fun-hero-sub{font-size:13px;color:#8A8578;max-width:380px;margin:0 auto 20px}
+.fun-mood-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.fun-mood-chip{font-size:12px;font-weight:500;padding:7px 14px;border-radius:20px;cursor:pointer;border:1px solid #3A3020;color:#C8B890;transition:all .15s;user-select:none}
+.fun-mood-chip:hover{border-color:var(--accent);color:var(--accent)}
+.fun-mood-chip.active{background:var(--accent);color:#fff;border-color:transparent}
+
+/* ── Grid ── */
+.fun-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+@media(max-width:900px){.fun-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.fun-grid{grid-template-columns:1fr}}
+
+/* ── Cards ── */
+.fun-card{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px}
+.fun-card-dark{background:#0E0E0C;border-color:#2A2A24}
+.fun-card-accent{background:var(--accent-light);border-color:#E8C97A}
+.fun-card-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
+.fun-card-dark .fun-card-label{color:#5A5850}
+
+/* ── Break timer ── */
+.fun-timer-display{font-size:48px;font-weight:500;color:#fff;letter-spacing:.04em;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.fun-timer-btns{display:flex;gap:6px;justify-content:center}
+.fun-timer-preset{font-size:11px;padding:5px 12px;border-radius:20px;border:.5px solid #3A3020;background:transparent;color:#8A8578;cursor:pointer;font-family:var(--font);transition:all .1s}
+.fun-timer-preset:hover{border-color:var(--accent);color:var(--accent)}
+.fun-timer-preset.active{background:var(--accent);color:#fff;border-color:transparent}
+.fun-timer-controls{display:flex;gap:8px;justify-content:center}
+.fun-ctrl-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s}
+.fun-ctrl-btn:hover{background:#B07A22}
+.fun-ctrl-ghost{background:#1E1E1A;color:#8A8578;padding:9px 12px}
+.fun-ctrl-ghost:hover{background:#2A2A24;color:#C8C5BC}
+
+/* ── Quote ── */
+.fun-quote-text{font-size:15px;color:var(--text-primary);line-height:1.7;font-style:italic;flex:1}
+.fun-quote-author{font-size:11px;color:var(--text-muted);font-weight:500}
+.fun-refresh-quote{align-self:flex-start;font-size:11px;color:var(--accent-text);background:transparent;border:none;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;padding:0;font-weight:500;transition:opacity .1s}
+.fun-refresh-quote:hover{opacity:.7}
+
+/* ── Joy checklist ── */
+.fun-joy-list{display:flex;flex-direction:column;gap:0}
+.fun-joy-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .1s;border-radius:4px}
+.fun-joy-item:last-child{border-bottom:none}
+.fun-joy-item:hover{background:var(--bg)}
+.fun-joy-item span{font-size:12px;color:var(--text-secondary);flex:1}
+.fun-joy-item.checked span{text-decoration:line-through;color:var(--text-muted)}
+.fun-joy-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:transparent;font-size:11px;transition:all .15s}
+.fun-joy-item.checked .fun-joy-check{background:var(--success);border-color:var(--success);color:#fff}
+.fun-joy-score{font-size:11px;color:var(--text-muted);text-align:center;padding-top:4px}
+
+/* ── Recommendation card ── */
+.fun-rec-emoji{font-size:36px;text-align:center}
+.fun-rec-title{font-size:15px;font-weight:500;color:var(--text-primary);text-align:center}
+.fun-rec-desc{font-size:12px;color:var(--text-secondary);text-align:center;line-height:1.6;flex:1}
+.fun-rec-btn{align-self:center;font-size:12px;font-weight:500;padding:8px 16px;border-radius:6px;border:.5px solid #E8C97A;background:transparent;color:var(--accent-text);cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;transition:all .15s}
+.fun-rec-btn:hover{background:var(--accent);color:#fff;border-color:transparent}
+
+/* ── Micro wins ── */
+.fun-win-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid var(--border);font-size:12px;color:var(--text-secondary)}
+.fun-win-item:last-child{border-bottom:none}
+.fun-win-item i{font-size:14px;flex-shrink:0}
+.fun-win-add-row{display:flex;gap:6px;margin-top:6px}
+.fun-win-input{flex:1;border:.5px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text-primary);background:var(--bg);outline:none}
+.fun-win-input:focus{border-color:var(--accent)}
+.fun-win-input::placeholder{color:var(--text-muted)}
+.fun-win-add-btn{width:30px;height:30px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.fun-win-add-btn:hover{background:#B07A22}
+
+/* ── Fun challenge ── */
+.fun-challenge-emoji{font-size:36px;text-align:center}
+.fun-challenge-text{font-size:13px;color:#C8B890;line-height:1.6;text-align:center;flex:1}
+.fun-challenge-actions{display:flex;gap:8px;justify-content:center}
+</style>
+
+<!-- ═══════════════════════════════ FUN BREAK JS ═══════════════════════════════ -->
+<script>
+// ─── Mood system ──────────────────────────────────────────────
+const moodData = {
+  energised: {
+    emoji: '⚡',
+    quotes: [
+      { text: 'Energy is contagious. Protect yours and share the good stuff.', author: '— Unknown' },
+      { text: 'You are not a machine. You are a human being doing extraordinary things.', author: '— Unknown' },
+      { text: 'Passion is energy. Feel the power that comes from focusing on what excites you.', author: '— Oprah Winfrey' },
+    ],
+    recs: [
+      { emoji:'🎵', title:'Queue your hype playlist', desc:'Put on a song that makes you want to move. Let it carry you into the next hour.' },
+      { emoji:'🚀', title:'Write your wildest goal', desc:'Open a blank doc and write one big scary goal you haven\'t told anyone. Just for you.' },
+      { emoji:'💃', title:'Do a 60-second dance', desc:'Stand up. One song. Full commitment. No audience needed.' },
+    ],
+    challenges: [
+      { emoji:'⚡', text:'Write down 3 things you\'re genuinely excited about this week.' },
+      { emoji:'🎯', text:'Spend 5 minutes on the task you\'ve been avoiding. Just 5.' },
+    ],
+  },
+  calm: {
+    emoji: '🌿',
+    quotes: [
+      { text: 'Almost everything will work again if you unplug it for a few minutes — including you.', author: '— Anne Lamott' },
+      { text: 'Rest is not idle, it is the space where creativity breathes.', author: '— Unknown' },
+      { text: 'Within you there is a stillness and a sanctuary to which you can retreat.', author: '— Hermann Hesse' },
+    ],
+    recs: [
+      { emoji:'🌬️', title:'Box breathing — 4 minutes', desc:'In for 4, hold for 4, out for 4. Repeat. Your nervous system will thank you.' },
+      { emoji:'☕', title:'Make yourself a warm drink', desc:'Step away from the screen. Hold the cup. Just exist for a moment.' },
+      { emoji:'🌳', title:'Look out the window', desc:'Find something natural — a tree, the sky, a bird. Watch it for two full minutes.' },
+    ],
+    challenges: [
+      { emoji:'🌿', text:'Put your phone face-down for the next 30 minutes. See how it feels.' },
+      { emoji:'🧘', text:'Sit quietly for 3 minutes. No task. No scrolling. Just breathe.' },
+    ],
+  },
+  playful: {
+    emoji: '😄',
+    quotes: [
+      { text: 'Play is the highest form of research.', author: '— Albert Einstein' },
+      { text: 'We don\'t stop playing because we grow old; we grow old because we stop playing.', author: '— George Bernard Shaw' },
+      { text: 'Laughter is an instant vacation.', author: '— Milton Berle' },
+    ],
+    recs: [
+      { emoji:'🎲', title:'Send a funny meme to a friend', desc:'Spread the serotonin. Connections are productivity fuel.' },
+      { emoji:'🖍️', title:'Doodle for 5 minutes', desc:'Draw something ridiculous. Zero skill required. The point is joy.' },
+      { emoji:'🎮', title:'Play a quick word game', desc:'Do a Wordle, a crossword clue, or just make up a funny company name.' },
+    ],
+    challenges: [
+      { emoji:'😄', text:'Tell someone at work a bad pun today. The groan is the goal.' },
+      { emoji:'🎉', text:'Celebrate something tiny — like finishing an email — with a small fist pump.' },
+    ],
+  },
+  inspired: {
+    emoji: '✨',
+    quotes: [
+      { text: 'The future belongs to those who believe in the beauty of their dreams.', author: '— Eleanor Roosevelt' },
+      { text: 'You don\'t have to see the whole staircase, just take the first step.', author: '— Martin Luther King Jr.' },
+      { text: 'Start where you are. Use what you have. Do what you can.', author: '— Arthur Ashe' },
+    ],
+    recs: [
+      { emoji:'📖', title:'Read one page of something beautiful', desc:'A poem, a chapter, a letter. Something that has nothing to do with work.' },
+      { emoji:'🌅', title:'Visualise your best day', desc:'Close your eyes. Picture exactly how your ideal workday feels a year from now.' },
+      { emoji:'✍️', title:'Write a letter to future Evelyn', desc:'What would you want to tell yourself 12 months from today? Write it.' },
+    ],
+    challenges: [
+      { emoji:'✨', text:'Look at your vision board or goals list right now. Pick one to act on this week.' },
+      { emoji:'💡', text:'Write down one idea you\'ve had but never acted on. What would it take to start?' },
+    ],
+  },
+  tired: {
+    emoji: '😴',
+    quotes: [
+      { text: 'Rest and self-compassion are radical acts of leadership.', author: '— Brené Brown' },
+      { text: 'Sustainable success is built on recovery, not on running on empty.', author: '— Unknown' },
+      { text: 'You can\'t pour from an empty cup. Take care of yourself first.', author: '— Unknown' },
+    ],
+    recs: [
+      { emoji:'😴', title:'Permission to nap — 20 minutes', desc:'A 20-minute rest is clinically proven to restore alertness. You have permission.' },
+      { emoji:'💧', title:'Drink a full glass of water now', desc:'Dehydration is often mistaken for tiredness. Drink slowly, breathe deeply.' },
+      { emoji:'👀', title:'20-20-20 eye rest', desc:'Look at something 20 feet away for 20 seconds. Repeat 3 times. Your eyes need it.' },
+    ],
+    challenges: [
+      { emoji:'😴', text:'Identify one commitment this week you can say no to. Protect your energy.' },
+      { emoji:'🌙', text:'Set a phone-down time tonight — and actually keep it.' },
+    ],
+  },
+};
+
+let currentMood = 'energised';
+let quoteIdx = 0;
+let recIdx = 0;
+let challengeIdx = 0;
+
+function setMood(chip, mood, emoji) {
+  currentMood = mood;
+  document.querySelectorAll('.fun-mood-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  document.getElementById('fun-emoji').textContent = emoji;
+  quoteIdx = 0; recIdx = 0; challengeIdx = 0;
+  updateQuote(); updateRec(); updateChallenge();
+}
+
+function updateQuote() {
+  const d = moodData[currentMood];
+  const q = d.quotes[quoteIdx % d.quotes.length];
+  document.getElementById('fun-quote').textContent = '\u201c' + q.text + '\u201d';
+  document.getElementById('fun-quote-author').textContent = q.author;
+}
+
+function refreshQuote() {
+  quoteIdx++;
+  updateQuote();
+  const btn = document.querySelector('.fun-refresh-quote');
+  btn.style.opacity = '0.4';
+  setTimeout(() => btn.style.opacity = '1', 300);
+}
+
+function updateRec() {
+  const d = moodData[currentMood];
+  const r = d.recs[recIdx % d.recs.length];
+  document.getElementById('fun-rec-emoji').textContent = r.emoji;
+  document.getElementById('fun-rec-title').textContent = r.title;
+  document.getElementById('fun-rec-desc').textContent = r.desc;
+}
+
+function nextRec() {
+  recIdx++;
+  updateRec();
+}
+
+function updateChallenge() {
+  const d = moodData[currentMood];
+  const c = d.challenges[challengeIdx % d.challenges.length];
+  document.getElementById('fun-ch-emoji').textContent = c.emoji;
+  document.getElementById('fun-ch-text').textContent = c.text;
+}
+
+function nextChallenge() {
+  challengeIdx++;
+  updateChallenge();
+}
+
+function completeChallenge(btn) {
+  btn.innerHTML = '<i class="ti ti-check"></i>Amazing!';
+  btn.style.background = 'var(--success)';
+  btn.disabled = true;
+  launchConfetti();
+  showNotif('Challenge complete! You\'re doing great 🎉');
+  setTimeout(() => {
+    btn.innerHTML = '<i class="ti ti-check"></i>Done it!';
+    btn.style.background = '';
+    btn.disabled = false;
+    nextChallenge();
+  }, 3000);
+}
+
+// ─── Joy checklist ────────────────────────────────────────────
+function toggleJoy(item) {
+  item.classList.toggle('checked');
+  updateJoyScore();
+}
+
+function updateJoyScore() {
+  const total = document.querySelectorAll('.fun-joy-item').length;
+  const done = document.querySelectorAll('.fun-joy-item.checked').length;
+  const msgs = [
+    'let\'s get one going ✨',
+    'great start! 💧',
+    'you\'re taking care of yourself 🌱',
+    'halfway there — you\'re doing well 💛',
+    'almost a full joy day 🌟',
+    'nearly perfect! keep going ⭐',
+    'full joy day! you\'re glowing 🌟🎉',
+  ];
+  document.getElementById('fun-joy-score').textContent = `${done} of ${total} — ${msgs[done]}`;
+  if (done === total) launchConfetti();
+}
+
+// ─── Micro wins ───────────────────────────────────────────────
+function addWin() {
+  const input = document.getElementById('fun-win-input');
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  const list = document.getElementById('fun-wins-list');
+  const item = document.createElement('div');
+  item.className = 'fun-win-item';
+  item.innerHTML = `<i class="ti ti-trophy" style="color:var(--accent)"></i><span>${escHtml(text)}</span>`;
+  list.appendChild(item);
+  input.value = '';
+  input.focus();
+  showNotif('Win logged! 🏆');
+  launchConfetti();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const winInput = document.getElementById('fun-win-input');
+  if (winInput) winInput.addEventListener('keydown', e => { if (e.key === 'Enter') addWin(); });
+});
+
+// ─── Break timer ──────────────────────────────────────────────
+let timerSeconds = 300;
+let timerRunning = false;
+let timerInterval = null;
+let timerTotal = 300;
+
+function setTimer(mins) {
+  resetTimer();
+  timerSeconds = mins * 60;
+  timerTotal = timerSeconds;
+  updateTimerDisplay();
+  document.querySelectorAll('.fun-timer-preset').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('fun-timer-btn');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.innerHTML = '<i class="ti ti-player-play"></i>Resume';
+  } else {
+    timerRunning = true;
+    btn.innerHTML = '<i class="ti ti-player-pause"></i>Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.innerHTML = '<i class="ti ti-player-play"></i>Start break';
+        showNotif('Break time over! Back to it 💪');
+        launchConfetti();
+        timerSeconds = timerTotal;
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = timerTotal;
+  updateTimerDisplay();
+  const btn = document.getElementById('fun-timer-btn');
+  if (btn) btn.innerHTML = '<i class="ti ti-player-play"></i>Start break';
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60).toString().padStart(2,'0');
+  const s = (timerSeconds % 60).toString().padStart(2,'0');
+  const el = document.getElementById('fun-timer');
+  if (el) el.textContent = `${m}:${s}`;
+}
+
+// ─── Confetti ─────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('fun-confetti');
+  if (!canvas) return;
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = Array.from({length:80}, () => ({
+    x: Math.random() * canvas.width,
+    y: -10 - Math.random() * 100,
+    r: 4 + Math.random() * 6,
+    d: 2 + Math.random() * 3,
+    color: ['#C68B2A','#2D7D4E','#1A5CA8','#B83030','#6B3FA0','#E8C97A'][Math.floor(Math.random()*6)],
+    tilt: Math.random() * 10 - 5,
+    tiltAngle: 0,
+    tiltSpeed: 0.05 + Math.random() * 0.1,
+  }));
+  let frame = 0;
+  const max = 120;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.tiltAngle += p.tiltSpeed;
+      p.y += p.d;
+      p.tilt = Math.sin(p.tiltAngle) * 12;
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+      ctx.stroke();
+    });
+    frame++;
+    if (frame < max) requestAnimationFrame(draw);
+    else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; }
+  }
+  draw();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+
+<!-- ═══════════════════════════════ TODO MODAL ═══════════════════════════════ -->
+<div class="todo-overlay" id="todo-overlay" onclick="closeTodo()"></div>
+<div class="todo-panel" id="todo-panel" role="dialog" aria-modal="true" aria-label="Daily to-do list">
+  <div class="todo-header">
+    <div class="todo-header-left">
+      <div class="todo-header-icon"><i class="ti ti-checkbox"></i></div>
+      <div>
+        <div class="todo-title">My Day</div>
+        <div class="todo-subtitle" id="todo-date-label">Thursday, June 26</div>
+      </div>
+    </div>
+    <button class="todo-close" onclick="closeTodo()" aria-label="Close"><i class="ti ti-x"></i></button>
+  </div>
+
+  <div class="todo-progress-wrap">
+    <div class="todo-progress-row">
+      <span class="todo-progress-label" id="todo-progress-label">0 of 0 done</span>
+      <span class="todo-progress-pct" id="todo-progress-pct">0%</span>
+    </div>
+    <div class="todo-progress-bar"><div class="todo-progress-fill" id="todo-progress-fill"></div></div>
+  </div>
+
+  <div class="todo-add-wrap">
+    <i class="ti ti-plus todo-add-icon"></i>
+    <input class="todo-add-input" id="todo-add-input" placeholder="Add a task…" maxlength="120">
+    <select class="todo-add-cat" id="todo-add-cat" aria-label="Category">
+      <option value="ceo">CEO only</option>
+      <option value="va">VA</option>
+      <option value="team">Team</option>
+      <option value="personal">Personal</option>
+    </select>
+    <button class="todo-add-btn" onclick="addTodo()" aria-label="Add task"><i class="ti ti-arrow-up"></i></button>
+  </div>
+
+  <div class="todo-filter-row">
+    <button class="todo-filter active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+    <button class="todo-filter" data-filter="pending" onclick="setFilter(this,'pending')">Pending</button>
+    <button class="todo-filter" data-filter="done" onclick="setFilter(this,'done')">Done</button>
+    <div style="flex:1"></div>
+    <button class="todo-clear-done" onclick="clearDone()"><i class="ti ti-trash"></i> Clear done</button>
+  </div>
+
+  <div class="todo-list" id="todo-list"></div>
+
+  <div class="todo-footer">
+    <div class="todo-footer-stat"><i class="ti ti-flame" style="color:var(--danger)"></i><span id="stat-urgent">0 urgent</span></div>
+    <div class="todo-footer-stat"><i class="ti ti-user" style="color:var(--info)"></i><span id="stat-delegate">0 to delegate</span></div>
+    <div class="todo-footer-stat"><i class="ti ti-check" style="color:var(--success)"></i><span id="stat-done">0 done</span></div>
+  </div>
+</div>
+
+<style>
+/* ── Todo trigger button ── */
+.todo-trigger-btn{display:flex;align-items:center;gap:6px;padding:0 12px;height:30px;background:var(--sidebar-bg);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:background .15s;flex-shrink:0}
+.todo-trigger-btn:hover{background:#1A1A16}
+.todo-trigger-btn i{font-size:15px}
+.todo-count-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
+
+/* ── Overlay ── */
+.todo-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;opacity:0;pointer-events:none;transition:opacity .2s}
+.todo-overlay.open{opacity:1;pointer-events:all}
+
+/* ── Panel ── */
+.todo-panel{position:fixed;top:0;right:0;height:100%;width:420px;max-width:100vw;background:var(--card-bg);z-index:401;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 32px rgba(0,0,0,.12)}
+.todo-panel.open{transform:translateX(0)}
+
+/* ── Header ── */
+.todo-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.todo-header-left{display:flex;align-items:center;gap:12px}
+.todo-header-icon{width:36px;height:36px;background:var(--sidebar-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--accent)}
+.todo-title{font-size:16px;font-weight:500;color:var(--text-primary)}
+.todo-subtitle{font-size:11px;color:var(--text-muted);margin-top:1px}
+.todo-close{width:28px;height:28px;border:.5px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;transition:all .1s}
+.todo-close:hover{background:var(--bg);color:var(--text-primary)}
+
+/* ── Progress ── */
+.todo-progress-wrap{padding:14px 20px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.todo-progress-row{display:flex;justify-content:space-between;margin-bottom:8px}
+.todo-progress-label{font-size:12px;color:var(--text-secondary)}
+.todo-progress-pct{font-size:12px;font-weight:500;color:var(--accent-text)}
+.todo-progress-bar{height:6px;background:var(--bg);border-radius:6px;overflow:hidden}
+.todo-progress-fill{height:100%;background:var(--accent);border-radius:6px;width:0;transition:width .4s ease}
+
+/* ── Add task ── */
+.todo-add-wrap{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.todo-add-icon{font-size:16px;color:var(--text-muted);flex-shrink:0}
+.todo-add-input{flex:1;border:none;outline:none;font-size:13px;font-family:var(--font);color:var(--text-primary);background:transparent;min-width:0}
+.todo-add-input::placeholder{color:var(--text-muted)}
+.todo-add-cat{border:.5px solid var(--border);border-radius:5px;font-size:11px;font-family:var(--font);color:var(--text-secondary);background:var(--bg);padding:3px 6px;outline:none;cursor:pointer;flex-shrink:0}
+.todo-add-btn{width:26px;height:26px;background:var(--accent);border:none;border-radius:5px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:background .15s}
+.todo-add-btn:hover{background:#B07A22}
+
+/* ── Filter row ── */
+.todo-filter-row{display:flex;align-items:center;gap:4px;padding:10px 20px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.todo-filter{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:.5px solid transparent;background:transparent;cursor:pointer;color:var(--text-muted);font-family:var(--font);transition:all .1s}
+.todo-filter:hover{background:var(--bg);color:var(--text-secondary)}
+.todo-filter.active{background:var(--sidebar-bg);color:#fff;border-color:transparent}
+.todo-clear-done{font-size:11px;color:var(--text-muted);background:transparent;border:none;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:4px;transition:all .1s}
+.todo-clear-done:hover{background:var(--danger-bg);color:var(--danger)}
+
+/* ── List ── */
+.todo-list{flex:1;overflow-y:auto;padding:8px 0}
+.todo-empty{text-align:center;padding:48px 20px;color:var(--text-muted)}
+.todo-empty i{font-size:32px;display:block;margin-bottom:8px}
+.todo-empty p{font-size:13px}
+
+/* ── Todo item ── */
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:11px 20px;border-bottom:.5px solid var(--border);transition:background .1s;position:relative}
+.todo-item:last-child{border-bottom:none}
+.todo-item:hover{background:var(--bg)}
+.todo-item.done-item .todo-item-title{text-decoration:line-through;color:var(--text-muted)}
+.todo-item.done-item .todo-item-meta{opacity:.5}
+.todo-item-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;background:transparent}
+.todo-item-check:hover{border-color:var(--accent)}
+.todo-item-check.checked{background:var(--success);border-color:var(--success);color:#fff}
+.todo-item-body{flex:1;min-width:0}
+.todo-item-title{font-size:13px;color:var(--text-primary);line-height:1.4;word-break:break-word}
+.todo-item-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.todo-item-tag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500}
+.todo-item-time{font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:3px}
+.todo-item-priority{font-size:10px;font-weight:600;color:var(--danger);display:flex;align-items:center;gap:2px}
+.todo-item-actions{display:flex;gap:4px;opacity:0;transition:opacity .1s;flex-shrink:0}
+.todo-item:hover .todo-item-actions{opacity:1}
+.todo-item-action-btn{width:22px;height:22px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-muted);transition:all .1s}
+.todo-item-action-btn:hover{background:var(--bg);color:var(--text-primary)}
+.todo-item-action-btn.del:hover{color:var(--danger);background:var(--danger-bg)}
+
+/* ── Footer ── */
+.todo-footer{display:flex;gap:0;border-top:.5px solid var(--border);flex-shrink:0}
+.todo-footer-stat{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 8px;font-size:11px;color:var(--text-secondary);border-right:.5px solid var(--border)}
+.todo-footer-stat:last-child{border-right:none}
+.todo-footer-stat i{font-size:14px}
+</style>
+
+<script>
+// ═══════════════════════════════ TODO SYSTEM ═══════════════════════════════
+
+let todos = [
+  { id:1, title:'Approve Lonza workshop proposal', cat:'ceo', done:false, urgent:true, added:'8:00 AM' },
+  { id:2, title:'Review Q3 MOA+ pricing deck', cat:'ceo', done:false, urgent:true, added:'8:00 AM' },
+  { id:3, title:'Decide on October workshop dates', cat:'ceo', done:false, urgent:false, added:'8:00 AM' },
+  { id:4, title:'Record podcast intro script sign-off', cat:'ceo', done:false, urgent:false, added:'8:00 AM' },
+  { id:5, title:'Compile Lonza meeting notes', cat:'va', done:false, urgent:false, added:'8:00 AM' },
+  { id:6, title:'Draft podcast guest outreach email', cat:'va', done:false, urgent:false, added:'8:00 AM' },
+  { id:7, title:'Organize Drive — One Life folder', cat:'va', done:false, urgent:false, added:'8:00 AM' },
+  { id:8, title:'Create workshop registration page', cat:'team', done:false, urgent:false, added:'8:00 AM' },
+  { id:9, title:'Reply to One Haven partnership email', cat:'ceo', done:true, urgent:false, added:'8:00 AM' },
+];
+let nextId = 10;
+let currentFilter = 'all';
+
+const catStyles = {
+  ceo:      { label:'CEO only',  cls:'tag-ceo' },
+  va:       { label:'VA',        cls:'tag-va' },
+  team:     { label:'Team',      cls:'tag-team' },
+  personal: { label:'Personal',  cls:'',  style:'background:#F3F0FB;color:#4A35A0' },
+};
+
+function openTodo() {
+  document.getElementById('todo-overlay').classList.add('open');
+  document.getElementById('todo-panel').classList.add('open');
+  renderTodos();
+  setTimeout(() => document.getElementById('todo-add-input').focus(), 300);
+  // set date label
+  const d = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('todo-date-label').textContent = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+}
+
+function closeTodo() {
+  document.getElementById('todo-overlay').classList.remove('open');
+  document.getElementById('todo-panel').classList.remove('open');
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-add-input');
+  const cat   = document.getElementById('todo-add-cat').value;
+  const title = input.value.trim();
+  if (!title) { input.focus(); return; }
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  todos.unshift({ id: nextId++, title, cat, done: false, urgent: false, added: time });
+  input.value = '';
+  input.focus();
+  renderTodos();
+  showNotif('Task added to My Day');
+}
+
+function toggleTodo(id) {
+  const t = todos.find(x => x.id === id);
+  if (t) { t.done = !t.done; renderTodos(); }
+}
+
+function deleteTodo(id) {
+  todos = todos.filter(x => x.id !== id);
+  renderTodos();
+}
+
+function toggleUrgent(id) {
+  const t = todos.find(x => x.id === id);
+  if (t) { t.urgent = !t.urgent; renderTodos(); }
+}
+
+function clearDone() {
+  const count = todos.filter(x => x.done).length;
+  if (!count) return;
+  todos = todos.filter(x => !x.done);
+  renderTodos();
+  showNotif(`Cleared ${count} completed task${count > 1 ? 's' : ''}`);
+}
+
+function setFilter(el, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.todo-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTodos();
+}
+
+function renderTodos() {
+  const list = document.getElementById('todo-list');
+  const total = todos.length;
+  const doneCount = todos.filter(x => x.done).length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  // progress
+  document.getElementById('todo-progress-label').textContent = `${doneCount} of ${total} done`;
+  document.getElementById('todo-progress-pct').textContent = pct + '%';
+  document.getElementById('todo-progress-fill').style.width = pct + '%';
+
+  // badge
+  const pending = todos.filter(x => !x.done).length;
+  const badge = document.getElementById('todo-count-badge');
+  badge.textContent = pending;
+  badge.style.background = pending > 0 ? 'var(--accent)' : 'var(--success)';
+
+  // footer stats
+  document.getElementById('stat-urgent').textContent = todos.filter(x => x.urgent && !x.done).length + ' urgent';
+  document.getElementById('stat-delegate').textContent = todos.filter(x => (x.cat==='va'||x.cat==='team') && !x.done).length + ' to delegate';
+  document.getElementById('stat-done').textContent = doneCount + ' done';
+
+  // filter
+  let filtered = todos;
+  if (currentFilter === 'pending') filtered = todos.filter(x => !x.done);
+  if (currentFilter === 'done')    filtered = todos.filter(x => x.done);
+
+  if (!filtered.length) {
+    const msgs = {
+      all:     { icon:'ti-checkbox', text: 'No tasks yet. Add one above.' },
+      pending: { icon:'ti-circle-check', text: 'All tasks are done. Great work!' },
+      done:    { icon:'ti-clock', text: 'Nothing completed yet today.' },
+    };
+    const m = msgs[currentFilter];
+    list.innerHTML = `<div class="todo-empty"><i class="ti ${m.icon}"></i><p>${m.text}</p></div>`;
+    return;
+  }
+
+  // sort: urgent + pending first, then by id desc
+  filtered = [...filtered].sort((a,b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    if (a.urgent !== b.urgent) return a.urgent ? -1 : 1;
+    return b.id - a.id;
+  });
+
+  list.innerHTML = filtered.map(t => {
+    const cs = catStyles[t.cat] || catStyles.ceo;
+    const tagStyle = cs.style ? `style="${cs.style}"` : '';
+    return `
+    <div class="todo-item${t.done ? ' done-item' : ''}" id="todo-${t.id}">
+      <div class="todo-item-check${t.done ? ' checked' : ''}"
+           onclick="toggleTodo(${t.id})"
+           role="checkbox" aria-checked="${t.done}" tabindex="0">
+        ${t.done ? '<i class="ti ti-check"></i>' : ''}
+      </div>
+      <div class="todo-item-body">
+        <div class="todo-item-title">${escHtml(t.title)}</div>
+        <div class="todo-item-meta">
+          <span class="todo-item-tag ${cs.cls}" ${tagStyle}>${cs.label}</span>
+          ${t.urgent ? `<span class="todo-item-priority"><i class="ti ti-flame"></i>Urgent</span>` : ''}
+          <span class="todo-item-time"><i class="ti ti-clock" style="font-size:10px"></i>${t.added}</span>
+        </div>
+      </div>
+      <div class="todo-item-actions">
+        <button class="todo-item-action-btn" onclick="toggleUrgent(${t.id})"
+                title="${t.urgent ? 'Remove urgent' : 'Mark urgent'}"
+                aria-label="Toggle urgent">
+          <i class="ti ${t.urgent ? 'ti-flame' : 'ti-flame'}" style="color:${t.urgent ? 'var(--danger)' : 'inherit'}"></i>
+        </button>
+        <button class="todo-item-action-btn del" onclick="deleteTodo(${t.id})" title="Delete" aria-label="Delete task">
+          <i class="ti ti-trash"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // keyboard support for todo checkboxes
+  list.querySelectorAll('.todo-item-check').forEach(el => {
+    el.onkeydown = e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+    };
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Add via Enter key
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('todo-add-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTodo();
+  });
+  // close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeTodo();
+  });
+  // initial badge
+  renderTodos();
+});
 </script>
 </body>
 </html>
