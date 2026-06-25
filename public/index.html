@@ -319,6 +319,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
       <div class="nav-item fun-nav-item" onclick="nav('fun',this)">
         <i class="ti ti-confetti"></i>Fun Break
       </div>
+      <div class="nav-item" onclick="nav('knowledge',this)">
+        <i class="ti ti-database"></i>Knowledge Base
+      </div>
     </div>
 
     <div class="sidebar-label">Workspaces</div>
@@ -1249,10 +1252,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
           <!-- Micro wins -->
           <div class="fun-card">
             <div class="fun-card-label">Micro wins today 🏆</div>
-            <div id="fun-wins-list">
-              <div class="fun-win-item"><i class="ti ti-trophy" style="color:var(--accent)"></i><span>Approved the Lonza proposal</span></div>
-              <div class="fun-win-item"><i class="ti ti-trophy" style="color:var(--accent)"></i><span>Replied to One Haven inquiry</span></div>
-            </div>
+            <div id="fun-wins-list"></div>
             <div class="fun-win-add-row">
               <input class="fun-win-input" id="fun-win-input" placeholder="Add a win, big or small…" maxlength="80">
               <button class="fun-win-add-btn" onclick="addWin()"><i class="ti ti-plus"></i></button>
@@ -1277,13 +1277,39 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
 
       </div>
 
+      <!-- ─────────────── KNOWLEDGE BASE ─────────────── -->
+      <div class="page" id="page-knowledge">
+        <div style="margin-bottom:20px">
+          <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">Knowledge Base</h1>
+          <p style="font-size:13px;color:var(--text-secondary)">Add your SOPs, pricing, key info, and anything you want Evelyn to remember. Everything here powers CEO Brain search.</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><div class="card-title"><i class="ti ti-plus-circle"></i>Add knowledge entry</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <input id="kb-title" placeholder="Title (e.g. MOA+ Pricing 2026, One Life Venue SOP)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+            <select id="kb-cat" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-secondary);background:var(--bg)">
+              <option value="SOP">SOP / Process</option>
+              <option value="Pricing">Pricing</option>
+              <option value="Client">Client info</option>
+              <option value="Company">Company info</option>
+              <option value="Strategy">Strategy</option>
+              <option value="General">General</option>
+            </select>
+            <textarea id="kb-content" placeholder="Paste the content here — pricing details, SOPs, key facts, client briefs, anything Evelyn should know…" style="height:120px;padding:10px 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;resize:vertical;color:var(--text-primary);background:var(--bg);line-height:1.6"></textarea>
+            <button onclick="addKnowledge()" style="background:var(--sidebar-bg);color:#fff;border:none;padding:10px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-database-plus"></i>Save to CEO Brain</button>
+          </div>
+        </div>
+        <div class="section-heading"><i class="ti ti-database"></i>Saved entries</div>
+        <div id="kb-list"></div>
+      </div>
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
 
 <script>
 // ─── Navigation ───────────────────────────────────────────────
-const pages = ['dashboard','brain','delegate','rescue','meetings','briefing','va','fun'];
+const pages = ['dashboard','brain','delegate','rescue','meetings','briefing','va','fun','knowledge'];
 
 function nav(id, el) {
   pages.forEach(p => {
@@ -1365,75 +1391,110 @@ function filterSource(el) {
   el.classList.add('active');
 }
 
+// ─── Core AI caller ───────────────────────────────────────────
+async function askClaude(userMessage, extraContext = '') {
+  const knowledge = getKnowledge();
+  const contextStr = extraContext ||
+    (knowledge.length ? 'Knowledge base entries:\n' + knowledge.map(k => `[${k.title}]: ${k.content}`).join('\n') : '');
+  const resp = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: [{ role: 'user', content: userMessage }],
+      context: contextStr
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error || 'API error');
+  }
+  const data = await resp.json();
+  return data.response;
+}
+
 // ─── CEO Brain ────────────────────────────────────────────────
-const brainData = {
-  'lonza': {
-    answer: 'Lonza workshop is confirmed for Oct 14–15 at their HQ. Budget ceiling: $12,000. Key decision pending: proposal approval required before today\'s 9am meeting. Risks: catering vendor not confirmed, no backup facilitator identified. VA needs to send the agenda template by June 28.',
-    results: [
-      { type:'Meeting transcript', icon:'ti-microphone', title:'Lonza Workshop Kickoff — June 24', snippet:'Decisions: Oct 14–15 dates confirmed, in-person format at Lonza HQ, $12,000 budget. Action: Evelyn to approve proposal by June 26.' },
-      { type:'Document', icon:'ti-file-text', title:'Lonza Workshop Proposal v2.pdf', snippet:'Full workshop structure, agenda, pricing breakdown, and facilitator profiles for the Oct 2026 leadership program.' },
-    ]
-  },
-  'one life': {
-    answer: 'One Life venue pricing was updated in the June 22 planning meeting: half-day rate increased from $800 to $950. Weekend packages approved. 3 existing clients are still on the old rate and need renewal conversations. The website pricing page has not yet been updated.',
-    results: [
-      { type:'Meeting transcript', icon:'ti-microphone', title:'One Life Venue Planning — June 22', snippet:'Venue pricing updated to $950/half-day. Weekend packages approved. Website update pending. 3 bookings at old rate need renewal.' },
-      { type:'Document', icon:'ti-file-invoice', title:'One Life Rate Card 2026.pdf', snippet:'Updated pricing schedule including venue hire, catering packages, AV options, and corporate day-rate bundles.' },
-    ]
-  },
-  'one haven': {
-    answer: 'One Haven partnership inquiry received June 23 — 3 days without a response. Sponsorship proposal is 5 days overdue with no owner assigned. All source materials are in the Lonza folder. VA can draft the 2-page proposal by Friday if assigned today.',
-    results: [
-      { type:'Task', icon:'ti-list-check', title:'One Haven sponsorship proposal', snippet:'No owner. 5 days overdue. Risk: high. Source materials available in Lonza folder. Suggested action: assign to VA immediately.' },
-    ]
-  },
-  'podcast': {
-    answer: 'Podcast has been mentioned across 4 recent meetings. Key themes: guest criteria (leadership + women in business), target audience alignment with Personal Brand, July launch timeline. VA research task is delegatable — 5 guests needed. No host script has been approved yet.',
-    results: [
-      { type:'Meeting transcript', icon:'ti-microphone', title:'Personal Brand Strategy — June 18', snippet:'Podcast launch target: July 2026. Guest criteria: women in leadership, entrepreneurship, education. Host intro script pending approval.' },
-    ]
-  },
-  'moa': {
-    answer: 'MOA+ pricing is currently under review — the Q3 deck update is blocked pending CEO decision on service tiers. Current offering spans Creative Services, Digital Media, and Strategy Retainers. Slides 4–8 cannot be updated until the service tier decision is made today.',
-    results: [
-      { type:'Document', icon:'ti-file-text', title:'MOA+ Pricing Deck Q3 2026', snippet:'Service tier breakdown, retainer options, and project-based pricing. Slides 4–8 blocked pending CEO decision on tier restructure.' },
-    ]
-  },
-};
+let brainHistory = [];
 
 function setQuery(q) {
   document.getElementById('brain-input').value = q;
   brainSearch();
 }
 
-function brainSearch() {
-  const q = document.getElementById('brain-input').value.toLowerCase().trim();
+async function brainSearch() {
+  const q = document.getElementById('brain-input').value.trim();
   if (!q) return;
-  const aiEl = document.getElementById('ai-response');
-  const textEl = document.getElementById('ai-text');
-  const cardsEl = document.getElementById('result-cards');
-  const emptyEl = document.getElementById('brain-empty');
 
-  let match = null;
-  for (const key in brainData) {
-    if (q.includes(key)) { match = brainData[key]; break; }
-  }
-  if (!match) {
-    match = {
-      answer: 'I searched across your meetings, documents, and SOPs. Upload more transcripts and connect your Google Drive to get richer results. Try terms like "Lonza", "One Life pricing", or "podcast".',
-      results: []
-    };
-  }
+  const aiEl   = document.getElementById('ai-response');
+  const textEl = document.getElementById('ai-text');
+  const cardsEl= document.getElementById('result-cards');
+  const emptyEl= document.getElementById('brain-empty');
+  const btn    = document.querySelector('.brain-search-btn');
+
   emptyEl.style.display = 'none';
   aiEl.style.display = 'block';
-  textEl.textContent = match.answer;
-  cardsEl.innerHTML = match.results.map(r => `
-    <div class="result-card">
-      <div class="result-type"><i class="ti ${r.icon}"></i>${r.type}</div>
-      <div class="result-title">${r.title}</div>
-      <div class="result-snippet">${r.snippet}</div>
-    </div>
-  `).join('');
+  textEl.innerHTML = '<span style="color:var(--text-muted);font-style:italic">Evelyn is thinking…</span>';
+  cardsEl.innerHTML = '';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader-2"></i><span>Thinking…</span>';
+
+  // add to conversation history
+  brainHistory.push({ role: 'user', content: q });
+  if (brainHistory.length > 10) brainHistory = brainHistory.slice(-10);
+
+  try {
+    const knowledge = getKnowledge();
+    const meetings  = getMeetings();
+    let ctx = '';
+    if (knowledge.length) ctx += 'Knowledge base:\n' + knowledge.map(k=>`[${k.title}]: ${k.content}`).join('\n') + '\n\n';
+    if (meetings.length)  ctx += 'Meeting records:\n' + meetings.map(m=>`[${m.title} - ${m.date}]: ${m.summary}`).join('\n');
+
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: brainHistory, context: ctx })
+    });
+    if (!resp.ok) throw new Error((await resp.json()).error || 'Error');
+    const data = await resp.json();
+    const answer = data.response;
+
+    brainHistory.push({ role: 'assistant', content: answer });
+
+    // render with line breaks
+    textEl.innerHTML = answer.replace(/\n/g, '<br>');
+
+    // show matching knowledge entries as result cards
+    const kMatches = knowledge.filter(k =>
+      q.toLowerCase().split(' ').some(w => w.length > 3 && k.content.toLowerCase().includes(w))
+    ).slice(0, 3);
+    const mMatches = meetings.filter(m =>
+      q.toLowerCase().split(' ').some(w => w.length > 3 && (m.title+m.summary).toLowerCase().includes(w))
+    ).slice(0, 2);
+
+    cardsEl.innerHTML = [
+      ...mMatches.map(m => `
+        <div class="result-card">
+          <div class="result-type"><i class="ti ti-microphone"></i>Meeting record</div>
+          <div class="result-title">${escHtmlBrain(m.title)} — ${m.date}</div>
+          <div class="result-snippet">${escHtmlBrain(m.summary.slice(0,180))}…</div>
+        </div>`),
+      ...kMatches.map(k => `
+        <div class="result-card">
+          <div class="result-type"><i class="ti ti-file-text"></i>Knowledge base</div>
+          <div class="result-title">${escHtmlBrain(k.title)}</div>
+          <div class="result-snippet">${escHtmlBrain(k.content.slice(0,180))}…</div>
+        </div>`)
+    ].join('');
+
+  } catch(e) {
+    textEl.innerHTML = `<span style="color:var(--danger)">${e.message}</span>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-sparkles"></i><span>Ask Evelyn</span>';
+}
+
+function escHtmlBrain(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 document.getElementById('brain-input').addEventListener('keydown', e => {
@@ -1453,48 +1514,336 @@ document.getElementById('top-search').addEventListener('keydown', e => {
   }
 });
 
-// ─── Delegate ─────────────────────────────────────────────────
-function generateDelegation() {
+// ─── Delegate — real AI ───────────────────────────────────────
+async function generateDelegation() {
   const btn = document.getElementById('del-gen-btn');
-  btn.innerHTML = '<i class="ti ti-loader-2"></i>Analyzing your tasks…';
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Analysing your tasks…';
   btn.disabled = true;
-  setTimeout(() => {
+
+  const tasks = getTasks();
+  const taskList = tasks.length
+    ? tasks.filter(t=>!t.done).map(t=>`- ${t.title} [${t.cat}]`).join('\n')
+    : 'No tasks in My Day yet — please add tasks first.';
+
+  const prompt = `Based on these current tasks, create a delegation plan split into three groups: CEO Only, VA/Assistant, and Team.\n\nTasks:\n${taskList}\n\nFor each task give: Task Title, Brief instruction (1-2 sentences), Priority (urgent/soon/ok), Estimated time.\n\nFormat your response as three clearly labelled sections: CEO ONLY, VA TASKS, TEAM TASKS. Be concise and executive-level.`;
+
+  try {
+    const answer = await askClaude(prompt);
     document.getElementById('del-output').style.display = 'block';
-    btn.innerHTML = '<i class="ti ti-check"></i>Plan generated — 10 tasks organized';
+
+    // inject AI answer into the existing delegation layout description area
+    const existing = document.getElementById('del-ai-answer');
+    if (existing) {
+      existing.innerHTML = answer.replace(/\n/g,'<br>');
+    } else {
+      const box = document.createElement('div');
+      box.id = 'del-ai-answer';
+      box.style.cssText = 'background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:16px;margin-bottom:16px;font-size:13px;color:var(--text-primary);line-height:1.8';
+      box.innerHTML = `<div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-text);margin-bottom:10px;display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles"></i>AI Delegation Plan</div>` + answer.replace(/\n/g,'<br>');
+      document.getElementById('del-output').prepend(box);
+    }
+
+    btn.innerHTML = '<i class="ti ti-check"></i>Plan generated';
     btn.style.background = '#1A4A1E';
-    showNotif('Delegation plan ready');
-  }, 1200);
+    showNotif('AI delegation plan ready');
+  } catch(e) {
+    btn.innerHTML = '<i class="ti ti-sparkles"></i>Generate Today\'s Delegation Plan';
+    btn.disabled = false;
+    showNotif('Error: ' + e.message);
+  }
 }
 
-// ─── Daily Briefing ───────────────────────────────────────────
-function generateBriefing() {
+// ─── Daily Briefing — real AI ─────────────────────────────────
+async function generateBriefing() {
   const btn = document.getElementById('briefing-btn');
   btn.innerHTML = '<i class="ti ti-loader-2"></i>Refreshing…';
   btn.disabled = true;
-  setTimeout(() => {
-    showNotif('Briefing refreshed');
-    btn.innerHTML = '<i class="ti ti-check"></i>Up to date';
-    setTimeout(() => {
-      btn.innerHTML = '<i class="ti ti-refresh"></i>Refresh briefing';
-      btn.disabled = false;
-    }, 2200);
-  }, 1400);
+
+  const tasks   = getTasks();
+  const meetings= getMeetings();
+  const today   = new Date().toDateString();
+
+  const prompt = `Generate an executive morning briefing for Evelyn for today (${today}).\n\nCurrent tasks:\n${tasks.map(t=>`- [${t.done?'DONE':'PENDING'}] ${t.title} (${t.cat}${t.urgent?', URGENT':''})`).join('\n') || 'None added yet'}\n\nRecent meetings:\n${meetings.slice(0,5).map(m=>`- ${m.title} (${m.date}): ${m.summary?.slice(0,100)}`).join('\n') || 'None recorded yet'}\n\nCreate a briefing with these sections:\n1. Good morning message (warm, 1 sentence)\n2. Top 3 priorities for today (with reason why each matters)\n3. What to delegate today (from pending tasks)\n4. Any risks or follow-ups needed\n5. Suggested focus schedule\n\nBe concise, warm, and executive-level. Address Evelyn directly.`;
+
+  try {
+    const answer = await askClaude(prompt);
+    const box = document.getElementById('briefing-ai-box');
+    if (box) {
+      box.innerHTML = answer.replace(/\n/g,'<br>');
+      box.style.display = 'block';
+    } else {
+      const newBox = document.createElement('div');
+      newBox.id = 'briefing-ai-box';
+      newBox.style.cssText = 'background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:20px;margin-bottom:20px;font-size:13px;color:var(--text-primary);line-height:1.8';
+      newBox.innerHTML = `<div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-text);margin-bottom:12px;display:flex;align-items:center;gap:4px"><i class="ti ti-sparkles"></i>Today's AI Briefing</div>` + answer.replace(/\n/g,'<br>');
+      const briefingPage = document.getElementById('page-briefing');
+      briefingPage.insertBefore(newBox, briefingPage.querySelector('.briefing-header').nextSibling);
+    }
+    btn.innerHTML = '<i class="ti ti-check"></i>Briefing ready';
+    showNotif('Morning briefing generated');
+    setTimeout(() => { btn.innerHTML = '<i class="ti ti-refresh"></i>Refresh briefing'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.innerHTML = '<i class="ti ti-refresh"></i>Refresh briefing';
+    btn.disabled = false;
+    showNotif('Error: ' + e.message);
+  }
 }
 
-// ─── Meeting upload ───────────────────────────────────────────
+// ─── Meeting upload — real AI transcript processing ───────────
 let uploadDone = false;
 function simulateUpload() {
-  if (uploadDone) return;
-  const zone = document.getElementById('upload-zone');
-  zone.innerHTML = '<i class="ti ti-loader-2"></i><p>Processing transcript…</p><span>Extracting decisions, actions, risks, next steps</span>';
-  setTimeout(() => {
-    uploadDone = true;
-    zone.innerHTML = '<i class="ti ti-check" style="color:var(--success)"></i><p style="color:var(--success);font-weight:500">Transcript processed and saved to CEO Brain</p><span>Scroll down to see the intelligence summary</span>';
-    zone.style.borderColor = 'var(--success)';
-    zone.style.background = 'var(--success-bg)';
-    showNotif('Meeting added to CEO Brain');
-  }, 1600);
+  // open a real text input dialog
+  const modal = document.getElementById('transcript-modal');
+  if (modal) modal.style.display = 'flex';
+  else openTranscriptModal();
 }
+
+function openTranscriptModal() {
+  const modal = document.createElement('div');
+  modal.id = 'transcript-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--card-bg);border-radius:var(--radius);padding:24px;width:100%;max-width:560px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:500">Add meeting transcript</div>
+        <button onclick="document.getElementById('transcript-modal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button>
+      </div>
+      <input id="t-title" placeholder="Meeting title (e.g. MOA+ Client Review)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      <input id="t-date" type="date" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      <textarea id="t-text" placeholder="Paste your meeting transcript or notes here…" style="height:180px;padding:10px 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;resize:vertical;color:var(--text-primary);background:var(--bg);line-height:1.6"></textarea>
+      <button onclick="processTranscript()" style="background:var(--accent);color:#fff;border:none;padding:10px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px" id="t-submit-btn"><i class="ti ti-sparkles"></i>Process with AI</button>
+    </div>`;
+  document.body.appendChild(modal);
+  // set today's date
+  document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
+}
+
+async function processTranscript() {
+  const title = document.getElementById('t-title').value.trim();
+  const date  = document.getElementById('t-date').value;
+  const text  = document.getElementById('t-text').value.trim();
+  const btn   = document.getElementById('t-submit-btn');
+
+  if (!title || !text) { showNotif('Please add a title and transcript text'); return; }
+
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Processing…';
+  btn.disabled = true;
+
+  const prompt = `Analyse this meeting transcript and extract the following in a structured format:\n\nMeeting: ${title}\nDate: ${date}\n\nTranscript:\n${text.slice(0, 4000)}\n\n---\nExtract and clearly label each section:\n\nSUMMARY: (2-3 sentences overview)\nKEY DECISIONS: (bullet list)\nACTION ITEMS: (bullet list with owner and deadline if mentioned)\nRISKS FLAGGED: (bullet list, or "None identified")\nNEXT STEPS: (bullet list)\nQUESTIONS RAISED: (bullet list, or "None")`;
+
+  try {
+    const answer = await askClaude(prompt);
+
+    // parse sections from AI response
+    const extract = (label, text) => {
+      const regex = new RegExp(`${label}:?\\s*([\\s\\S]*?)(?=\\n[A-Z ]+:|$)`, 'i');
+      const m = text.match(regex);
+      return m ? m[1].trim() : '';
+    };
+
+    const meeting = {
+      id: Date.now(),
+      title,
+      date,
+      summary:   extract('SUMMARY', answer),
+      decisions: extract('KEY DECISIONS', answer),
+      actions:   extract('ACTION ITEMS', answer),
+      risks:     extract('RISKS FLAGGED', answer),
+      nextSteps: extract('NEXT STEPS', answer),
+      questions: extract('QUESTIONS RAISED', answer),
+      raw:       answer
+    };
+
+    // save to localStorage
+    const meetings = getMeetings();
+    meetings.unshift(meeting);
+    localStorage.setItem('evelyn_meetings', JSON.stringify(meetings));
+
+    // render it on the meetings page
+    renderMeetings();
+
+    document.getElementById('transcript-modal').style.display = 'none';
+    showNotif('Meeting processed and saved to CEO Brain');
+  } catch(e) {
+    showNotif('Error: ' + e.message);
+    btn.innerHTML = '<i class="ti ti-sparkles"></i>Process with AI';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA LAYER — everything saves to localStorage
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Tasks ────────────────────────────────────────────────────
+function getTasks()         { try { return JSON.parse(localStorage.getItem('evelyn_tasks') || '[]'); } catch(e){ return []; } }
+function saveTasks(tasks)   { localStorage.setItem('evelyn_tasks', JSON.stringify(tasks)); }
+
+// ─── Meetings ─────────────────────────────────────────────────
+function getMeetings()      { try { return JSON.parse(localStorage.getItem('evelyn_meetings') || '[]'); } catch(e){ return []; } }
+function saveMeetings(m)    { localStorage.setItem('evelyn_meetings', JSON.stringify(m)); }
+
+// ─── Knowledge base ───────────────────────────────────────────
+function getKnowledge()     { try { return JSON.parse(localStorage.getItem('evelyn_knowledge') || '[]'); } catch(e){ return []; } }
+function saveKnowledge(k)   { localStorage.setItem('evelyn_knowledge', JSON.stringify(k)); }
+
+// ─── Wins ────────────────────────────────────────────────────
+function getWins()          { try { return JSON.parse(localStorage.getItem('evelyn_wins') || '[]'); } catch(e){ return []; } }
+function saveWins(w)        { localStorage.setItem('evelyn_wins', JSON.stringify(w)); }
+
+// ─── Render saved meetings on the meetings page ───────────────
+function renderMeetings() {
+  const meetings = getMeetings();
+  const container = document.getElementById('saved-meetings-list');
+  if (!container) return;
+
+  if (!meetings.length) {
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px"><i class="ti ti-microphone-off" style="font-size:28px;display:block;margin-bottom:8px"></i>No meetings yet. Upload your first transcript above.</div>';
+    return;
+  }
+
+  container.innerHTML = meetings.map(m => `
+    <div class="processed-meeting" style="margin-bottom:16px">
+      <div class="meeting-banner" style="justify-content:space-between">
+        <div>
+          <div class="meeting-banner-title">${escHtmlBrain(m.title)}</div>
+          <div class="meeting-banner-sub">${m.date}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="meeting-banner-badge">Processed</div>
+          <button onclick="deleteMeeting(${m.id})" style="background:none;border:none;cursor:pointer;color:#8A8578;font-size:14px" title="Delete"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+      <div class="meeting-sections">
+        <div class="meeting-section">
+          <div class="meeting-section-title"><i class="ti ti-check"></i>Key decisions</div>
+          ${(m.decisions||'None recorded').split('\n').filter(l=>l.trim()).map(l=>`<div class="meeting-point">${escHtmlBrain(l.replace(/^[-•*]\s*/,''))}</div>`).join('') || '<div class="meeting-point">None recorded</div>'}
+        </div>
+        <div class="meeting-section">
+          <div class="meeting-section-title"><i class="ti ti-list-check"></i>Action items</div>
+          ${(m.actions||'None recorded').split('\n').filter(l=>l.trim()).map(l=>`<div class="meeting-point">${escHtmlBrain(l.replace(/^[-•*]\s*/,''))}</div>`).join('') || '<div class="meeting-point">None recorded</div>'}
+        </div>
+        <div class="meeting-section">
+          <div class="meeting-section-title"><i class="ti ti-alert-circle"></i>Risks flagged</div>
+          ${(m.risks||'None identified').split('\n').filter(l=>l.trim()).map(l=>`<div class="meeting-point">${escHtmlBrain(l.replace(/^[-•*]\s*/,''))}</div>`).join('') || '<div class="meeting-point">None identified</div>'}
+        </div>
+        <div class="meeting-section">
+          <div class="meeting-section-title"><i class="ti ti-arrow-right"></i>Next steps</div>
+          ${(m.nextSteps||'None recorded').split('\n').filter(l=>l.trim()).map(l=>`<div class="meeting-point">${escHtmlBrain(l.replace(/^[-•*]\s*/,''))}</div>`).join('') || '<div class="meeting-point">None recorded</div>'}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function deleteMeeting(id) {
+  const meetings = getMeetings().filter(m => m.id !== id);
+  saveMeetings(meetings);
+  renderMeetings();
+  showNotif('Meeting deleted');
+}
+
+// ─── Render saved wins on fun page ───────────────────────────
+function renderWins() {
+  const wins = getWins();
+  const list = document.getElementById('fun-wins-list');
+  if (!list) return;
+  list.innerHTML = wins.map((w,i) => `
+    <div class="fun-win-item">
+      <i class="ti ti-trophy" style="color:var(--accent)"></i>
+      <span style="flex:1">${escHtmlBrain(w)}</span>
+      <button onclick="deleteWin(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px"><i class="ti ti-x"></i></button>
+    </div>`).join('') || '<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No wins logged yet — add your first one!</div>';
+}
+
+function deleteWin(idx) {
+  const wins = getWins();
+  wins.splice(idx, 1);
+  saveWins(wins);
+  renderWins();
+}
+
+// Patch addWin to save to localStorage
+const _origAddWin = addWin;
+function addWin() {
+  const input = document.getElementById('fun-win-input');
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  const wins = getWins();
+  wins.push(text);
+  saveWins(wins);
+  input.value = '';
+  renderWins();
+  showNotif('Win logged! 🏆');
+  launchConfetti();
+}
+
+// ─── Knowledge base page ─────────────────────────────────────
+function renderKnowledge() {
+  const kb = getKnowledge();
+  const list = document.getElementById('kb-list');
+  if (!list) return;
+  if (!kb.length) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px"><i class="ti ti-database-off" style="font-size:28px;display:block;margin-bottom:8px"></i>No knowledge entries yet. Add your SOPs, pricing, and key info above.</div>';
+    return;
+  }
+  list.innerHTML = kb.map((k,i) => `
+    <div style="background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:500;color:var(--text-primary)">${escHtmlBrain(k.title)}</div>
+        <button onclick="deleteKnowledge(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px"><i class="ti ti-trash"></i></button>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">${escHtmlBrain(k.content.slice(0,200))}${k.content.length>200?'…':''}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:6px">${k.category || 'General'} · Added ${k.date}</div>
+    </div>`).join('');
+}
+
+function deleteKnowledge(idx) {
+  const kb = getKnowledge();
+  kb.splice(idx, 1);
+  saveKnowledge(kb);
+  renderKnowledge();
+  showNotif('Entry deleted');
+}
+
+function addKnowledge() {
+  const title   = document.getElementById('kb-title').value.trim();
+  const content = document.getElementById('kb-content').value.trim();
+  const cat     = document.getElementById('kb-cat').value;
+  if (!title || !content) { showNotif('Please add a title and content'); return; }
+  const kb = getKnowledge();
+  kb.unshift({ title, content, category: cat, date: new Date().toLocaleDateString() });
+  saveKnowledge(kb);
+  document.getElementById('kb-title').value = '';
+  document.getElementById('kb-content').value = '';
+  renderKnowledge();
+  showNotif('Added to CEO Brain knowledge base');
+}
+
+// ─── Boot: load saved data ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderMeetings();
+  renderWins();
+  renderKnowledge();
+
+  // patch the meetings upload zone to open modal
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.onclick = () => openTranscriptModal();
+    zone.innerHTML = '<i class="ti ti-upload"></i><p>Click to add a meeting transcript</p><span>Paste text from any meeting — AI will extract decisions, actions, risks, and next steps</span>';
+  }
+
+  // replace static meetings list with saved-meetings-list container
+  const oldMeetings = document.querySelectorAll('.processed-meeting');
+  if (oldMeetings.length) {
+    const parent = oldMeetings[0].parentNode;
+    const div = document.createElement('div');
+    div.id = 'saved-meetings-list';
+    // remove old static cards
+    oldMeetings.forEach(el => el.remove());
+    parent.appendChild(div);
+    renderMeetings();
+  }
+});
 
 // ─── Live date ────────────────────────────────────────────────
 (function() {
@@ -2292,18 +2641,9 @@ function escHtml(s) {
 <script>
 // ═══════════════════════════════ TODO SYSTEM ═══════════════════════════════
 
-let todos = [
-  { id:1, title:'Approve Lonza workshop proposal', cat:'ceo', done:false, urgent:true, added:'8:00 AM' },
-  { id:2, title:'Review Q3 MOA+ pricing deck', cat:'ceo', done:false, urgent:true, added:'8:00 AM' },
-  { id:3, title:'Decide on October workshop dates', cat:'ceo', done:false, urgent:false, added:'8:00 AM' },
-  { id:4, title:'Record podcast intro script sign-off', cat:'ceo', done:false, urgent:false, added:'8:00 AM' },
-  { id:5, title:'Compile Lonza meeting notes', cat:'va', done:false, urgent:false, added:'8:00 AM' },
-  { id:6, title:'Draft podcast guest outreach email', cat:'va', done:false, urgent:false, added:'8:00 AM' },
-  { id:7, title:'Organize Drive — One Life folder', cat:'va', done:false, urgent:false, added:'8:00 AM' },
-  { id:8, title:'Create workshop registration page', cat:'team', done:false, urgent:false, added:'8:00 AM' },
-  { id:9, title:'Reply to One Haven partnership email', cat:'ceo', done:true, urgent:false, added:'8:00 AM' },
-];
-let nextId = 10;
+let todos = (function() { try { return JSON.parse(localStorage.getItem('evelyn_todos') || 'null') || []; } catch(e){ return []; } })();
+let nextId = todos.length ? Math.max(...todos.map(t=>t.id)) + 1 : 1;
+function saveTodosStore() { localStorage.setItem('evelyn_todos', JSON.stringify(todos)); }
 let currentFilter = 'all';
 
 const catStyles = {
@@ -2340,29 +2680,32 @@ function addTodo() {
   todos.unshift({ id: nextId++, title, cat, done: false, urgent: false, added: time });
   input.value = '';
   input.focus();
+  saveTodosStore();
   renderTodos();
   showNotif('Task added to My Day');
 }
 
 function toggleTodo(id) {
   const t = todos.find(x => x.id === id);
-  if (t) { t.done = !t.done; renderTodos(); }
+  if (t) { t.done = !t.done; saveTodosStore(); renderTodos(); }
 }
 
 function deleteTodo(id) {
   todos = todos.filter(x => x.id !== id);
+  saveTodosStore();
   renderTodos();
 }
 
 function toggleUrgent(id) {
   const t = todos.find(x => x.id === id);
-  if (t) { t.urgent = !t.urgent; renderTodos(); }
+  if (t) { t.urgent = !t.urgent; saveTodosStore(); renderTodos(); }
 }
 
 function clearDone() {
   const count = todos.filter(x => x.done).length;
   if (!count) return;
   todos = todos.filter(x => !x.done);
+  saveTodosStore();
   renderTodos();
   showNotif(`Cleared ${count} completed task${count > 1 ? 's' : ''}`);
 }
