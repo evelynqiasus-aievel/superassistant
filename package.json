@@ -1,0 +1,9 @@
+{
+  "name": "evelyn-os",
+  "version": "1.0.0",
+  "description": "Evelyn OS - AI Chief of Staff",
+  "main": "api/chat.js",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0"
+  }
+}
