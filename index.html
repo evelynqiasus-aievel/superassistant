@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evelyn OS — AI Chief of Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sidebar-w:220px;
+  --bg:#FAFAF9;
+  --sidebar-bg:#0E0E0C;
+  --sidebar-text:#B8B5A8;
+  --sidebar-active:#FFFFFF;
+  --sidebar-active-bg:#1E1E1A;
+  --card-bg:#FFFFFF;
+  --border:#E8E6E0;
+  --text-primary:#0E0E0C;
+  --text-secondary:#6B6860;
+  --text-muted:#A09D96;
+  --accent:#C68B2A;
+  --accent-light:#FBF3E3;
+  --accent-text:#7A500D;
+  --success:#2D7D4E;
+  --success-bg:#EBF5EF;
+  --danger:#B83030;
+  --danger-bg:#FBEAEA;
+  --warning:#8C5E0A;
+  --warning-bg:#FDF3E1;
+  --info:#1A5CA8;
+  --info-bg:#E6F0FB;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius:10px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font-size:14px;line-height:1.5}
+
+/* LAYOUT */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;padding:16px 0;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* SIDEBAR */
+.sidebar-logo{padding:0 16px 20px;display:flex;align-items:center;gap:8px}
+.sidebar-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.sidebar-logo-text{font-size:14px;font-weight:500;color:#fff;letter-spacing:.02em}
+.sidebar-logo-sub{font-size:10px;color:var(--sidebar-text);letter-spacing:.08em;text-transform:uppercase}
+.sidebar-section{padding:4px 8px;margin-bottom:2px}
+.sidebar-label{font-size:10px;color:#5A5850;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:8px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer;color:var(--sidebar-text);font-size:13px;transition:all .1s;margin:1px 0;user-select:none}
+.nav-item:hover{background:#1A1A16;color:#D4D1C8}
+.nav-item.active{background:var(--sidebar-active-bg);color:var(--sidebar-active)}
+.nav-item i{font-size:16px;width:18px;text-align:center}
+.nav-badge{margin-left:auto;background:#B83030;color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:20px}
+.sidebar-footer{margin-top:auto;padding:12px 8px;border-top:.5px solid #1E1E18;position:relative}
+.ws-switcher{background:#1A1A16;border-radius:6px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.ws-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;transition:background .2s}
+.ws-name{font-size:12px;color:#C8C5BC;font-weight:500;flex:1}
+.ws-modal{display:none;position:absolute;bottom:calc(100% + 4px);left:8px;right:8px;background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:100}
+.ws-modal.open{display:block}
+.ws-option{padding:7px 10px;border-radius:6px;font-size:13px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:8px}
+.ws-option:hover{background:var(--bg)}
+.ws-option.active{color:var(--accent-text);font-weight:500}
+.ws-color{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* TOPBAR */
+.topbar{padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:.5px solid var(--border);background:var(--card-bg);flex-shrink:0}
+.search-wrap{flex:1;max-width:460px;position:relative}
+.search-wrap>i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none}
+.search-input{width:100%;height:34px;padding:0 10px 0 34px;background:var(--bg);border:.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-primary);font-family:var(--font);outline:none}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(198,139,42,.15)}
+.search-input::placeholder{color:var(--text-muted)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{width:30px;height:30px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer;border:none;font-family:var(--font)}
+.icon-btn{width:30px;height:30px;border:.5px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;color:var(--text-secondary);transition:all .1s}
+.icon-btn:hover{background:var(--bg);color:var(--text-primary)}
+.menu-btn{display:none}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:20px}
+.page{display:none}
+.page.active{display:block}
+
+/* NOTIFICATION */
+.notification{position:fixed;top:16px;right:20px;background:var(--sidebar-bg);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;display:flex;align-items:center;gap:8px;transform:translateY(-80px);opacity:0;transition:all .3s;pointer-events:none}
+.notification.show{transform:translateY(0);opacity:1}
+
+/* DASHBOARD */
+.greeting-banner{background:#0E0E0C;border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.greeting-date{font-size:11px;color:var(--accent);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.greeting-h{font-size:18px;font-weight:500;color:#fff;margin-bottom:4px}
+.greeting-p{font-size:13px;color:#8A8578;max-width:380px}
+.briefing-open-btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:var(--font);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.briefing-open-btn:hover{background:#B07A22}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-label{font-size:11px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.stat-value{font-size:24px;font-weight:500;line-height:1}
+.stat-sub{font-size:11px;color:var(--text-secondary);margin-top:4px}
+
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* CARDS */
+.card{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:500;color:var(--text-primary);display:flex;align-items:center;gap:6px}
+.card-title i{font-size:15px;color:var(--text-muted)}
+.card-action{font-size:12px;color:var(--accent-text);cursor:pointer;font-weight:500}
+.card-action:hover{text-decoration:underline}
+
+/* TASKS */
+.task-item{padding:9px 0;border-bottom:.5px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.task-item:last-child{border-bottom:none;padding-bottom:0}
+.task-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;transition:all .15s;font-size:10px}
+.task-check:hover{border-color:var(--accent)}
+.task-check.done{background:var(--success);border-color:var(--success);color:#fff}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:13px;color:var(--text-primary)}
+.task-title.done{text-decoration:line-through;color:var(--text-muted)}
+.task-meta{font-size:11px;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.task-tag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:500}
+.tag-ceo{background:#FBF3E3;color:#7A500D}
+.tag-va{background:#E6F0FB;color:#1A4A8A}
+.tag-team{background:#EBF5EF;color:#1A5E38}
+.tag-risk{background:#FBEAEA;color:#8A2020}
+
+/* BADGES */
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.badge-urgent{background:var(--danger-bg);color:var(--danger)}
+.badge-soon{background:var(--warning-bg);color:var(--warning)}
+.badge-ok{background:var(--success-bg);color:var(--success)}
+
+/* MEETINGS */
+.meeting-item{padding:9px 0;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:10px}
+.meeting-item:last-child{border-bottom:none}
+.meeting-time{font-size:11px;color:var(--accent-text);font-weight:500;min-width:40px}
+.meeting-name{font-size:13px;color:var(--text-primary)}
+.meeting-co{font-size:11px;color:var(--text-muted)}
+.deep-work-bar{background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-top:8px}
+.deep-work-fill{height:100%;background:var(--accent);width:52%;border-radius:6px}
+
+/* CEO BRAIN */
+.brain-search-wrap{background:var(--card-bg);border:1.5px solid var(--accent);border-radius:var(--radius);display:flex;align-items:center;overflow:hidden;box-shadow:0 0 0 3px rgba(198,139,42,.1);margin-bottom:16px}
+.brain-search-icon{padding:14px;font-size:20px;color:var(--accent);flex-shrink:0}
+.brain-search-input{flex:1;border:none;outline:none;font-size:16px;font-family:var(--font);color:var(--text-primary);background:transparent;padding:14px 0;min-width:0}
+.brain-search-input::placeholder{color:var(--text-muted)}
+.brain-search-btn{background:var(--accent);border:none;padding:10px 18px;margin:7px;border-radius:7px;font-size:13px;font-weight:500;color:#fff;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.brain-search-btn:hover{background:#B07A22}
+.suggestions-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.suggestion-chip{background:var(--card-bg);border:.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all .1s}
+.suggestion-chip:hover{border-color:var(--accent);color:var(--accent-text);background:var(--accent-light)}
+.source-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.source-tag{background:var(--bg);border:.5px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .1s}
+.source-tag.active{background:var(--sidebar-bg);color:#fff;border-color:transparent}
+.source-tag i{font-size:13px}
+.ai-response{background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.ai-response-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-text);margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.ai-response-text{font-size:13px;color:var(--text-primary);line-height:1.7}
+.ai-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.ai-action-btn{background:var(--card-bg);border:.5px solid var(--border);border-radius:6px;padding:8px 10px;font-size:11px;font-weight:500;color:var(--text-secondary);cursor:pointer;text-align:center;transition:all .1s;font-family:var(--font)}
+.ai-action-btn:hover{border-color:var(--accent);color:var(--accent-text)}
+.result-card{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+.result-type{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.result-type i{font-size:12px}
+.result-title{font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:4px}
+.result-snippet{font-size:12px;color:var(--text-secondary);line-height:1.6}
+
+/* DELEGATE */
+.del-gen-btn{background:var(--sidebar-bg);color:#fff;border:none;padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:16px;transition:background .15s}
+.del-gen-btn:hover:not(:disabled){background:#1A1A16}
+.del-gen-btn:disabled{opacity:.7;cursor:not-allowed}
+.del-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.del-col-header{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;padding:8px 12px;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:6px}
+.del-col-ceo{background:#0E0E0C;color:#C68B2A}
+.del-col-va{background:var(--info-bg);color:var(--info)}
+.del-col-team{background:var(--success-bg);color:var(--success)}
+.del-card{background:var(--card-bg);border:.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius)}
+.del-task{padding:11px 12px;border-bottom:.5px solid var(--border)}
+.del-task:last-child{border-bottom:none}
+.del-task-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.del-task-desc{font-size:11px;color:var(--text-secondary);line-height:1.5;margin-bottom:6px}
+.del-task-meta{font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.del-send-btn{font-size:11px;color:var(--accent-text);cursor:pointer;border:.5px solid #E8C97A;padding:2px 8px;border-radius:4px;background:var(--accent-light);white-space:nowrap;font-family:var(--font)}
+.del-send-btn:hover{background:#F5E9C8}
+.del-info{background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--accent-text);display:flex;gap:8px;align-items:flex-start;margin-top:14px}
+.del-info i{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* RESCUE */
+.rescue-stat-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.rescue-stat{border-radius:6px;padding:8px 14px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px}
+.rescue-item{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
+.risk-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.risk-high{background:var(--danger)}
+.risk-med{background:#E8940A}
+.rescue-body{flex:1;min-width:0}
+.rescue-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.rescue-meta{font-size:11px;color:var(--text-muted);display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.rescue-suggestion{font-size:12px;color:var(--text-secondary);background:var(--bg);padding:8px 10px;border-radius:6px;border-left:2px solid var(--accent);line-height:1.6}
+.rescue-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.small-btn{font-size:11px;padding:5px 12px;border-radius:4px;border:.5px solid var(--border);cursor:pointer;background:transparent;font-family:var(--font);color:var(--text-secondary);transition:all .1s}
+.small-btn:hover{background:var(--bg)}
+.small-btn.primary{background:var(--sidebar-bg);color:#fff;border-color:transparent}
+.small-btn.primary:hover{background:#1A1A16}
+
+/* MEETING INTEL */
+.upload-zone{background:var(--card-bg);border:1.5px dashed var(--border);border-radius:var(--radius);padding:36px;text-align:center;cursor:pointer;margin-bottom:20px;transition:all .15s}
+.upload-zone:hover{border-color:var(--accent);background:var(--accent-light)}
+.upload-zone i{font-size:32px;color:var(--text-muted);margin-bottom:10px;display:block}
+.upload-zone p{font-size:14px;color:var(--text-secondary);margin-bottom:4px}
+.upload-zone span{font-size:12px;color:var(--text-muted)}
+.section-heading{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-heading i{font-size:15px;color:var(--accent)}
+.processed-meeting{background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.meeting-banner{background:var(--sidebar-bg);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.meeting-banner-title{font-size:14px;font-weight:500;color:#fff}
+.meeting-banner-sub{font-size:11px;color:#8A8578;margin-top:2px}
+.meeting-banner-badge{background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;flex-shrink:0}
+.meeting-sections{display:grid;grid-template-columns:1fr 1fr}
+.meeting-section{padding:14px 16px;border-right:.5px solid var(--border);border-bottom:.5px solid var(--border)}
+.meeting-section:nth-child(even){border-right:none}
+.meeting-section:nth-last-child(-n+2){border-bottom:none}
+.meeting-section-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:4px}
+.meeting-section-title i{font-size:13px}
+.meeting-point{font-size:12px;color:var(--text-secondary);line-height:1.5;padding:2px 0;display:flex;gap:6px}
+.meeting-point::before{content:'·';color:var(--accent);flex-shrink:0}
+
+/* BRIEFING */
+.briefing-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
+.briefing-greeting{font-size:22px;font-weight:500;color:var(--text-primary)}
+.briefing-sub{font-size:14px;color:var(--text-secondary);margin-top:4px}
+.briefing-refresh-btn{background:var(--sidebar-bg);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.briefing-refresh-btn:hover:not(:disabled){background:#1A1A16}
+.briefing-refresh-btn:disabled{opacity:.7;cursor:not-allowed}
+.briefing-section{margin-bottom:20px}
+.briefing-section-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:10px;padding-bottom:8px;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:6px}
+.briefing-section-title i{font-size:14px;color:var(--accent)}
+.priority-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border)}
+.priority-item:last-child{border-bottom:none}
+.priority-num{width:20px;height:20px;background:var(--sidebar-bg);color:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:2px}
+.priority-text{font-size:13px;color:var(--text-primary)}
+.priority-reason{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.schedule-item{display:flex;gap:12px;padding:8px 0;border-bottom:.5px solid var(--border)}
+.schedule-item:last-child{border-bottom:none}
+.schedule-time-col{min-width:52px;text-align:right;flex-shrink:0}
+.schedule-time{font-size:12px;font-weight:500;color:var(--accent-text)}
+.schedule-title{font-size:13px;color:var(--text-primary)}
+.schedule-note{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;left:0;height:100%;z-index:200;transform:translateX(-100%);transition:transform .2s}
+  .sidebar.open{transform:translateX(0)}
+  .menu-btn{display:flex}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .cols-2{grid-template-columns:1fr}
+  .del-cols{grid-template-columns:1fr}
+  .meeting-sections{grid-template-columns:1fr}
+  .meeting-section{border-right:none !important}
+  .meeting-section:nth-last-child(-n+2){border-bottom:.5px solid var(--border)}
+  .meeting-section:last-child{border-bottom:none}
+  .ai-actions{grid-template-columns:1fr 1fr}
+  .greeting-banner{flex-direction:column}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr}
+  .brain-search-btn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="notification" id="notif">
+  <i class="ti ti-check"></i><span id="notif-text">Done</span>
+</div>
+
+<div class="app">
+
+  <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+  <nav class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">E</div>
+      <div>
+        <div class="sidebar-logo-text">Evelyn OS</div>
+        <div class="sidebar-logo-sub">Chief of Staff</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="nav-item active" onclick="nav('dashboard',this)" aria-current="page">
+        <i class="ti ti-layout-dashboard"></i>Dashboard
+      </div>
+      <div class="nav-item" onclick="nav('brain',this)">
+        <i class="ti ti-brain"></i>CEO Brain
+      </div>
+      <div class="nav-item" onclick="nav('delegate',this)">
+        <i class="ti ti-arrows-transfer-down"></i>Delegate<span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item" onclick="nav('rescue',this)">
+        <i class="ti ti-alert-triangle"></i>Task Rescue<span class="nav-badge">4</span>
+      </div>
+      <div class="nav-item" onclick="nav('meetings',this)">
+        <i class="ti ti-microphone"></i>Meetings
+      </div>
+      <div class="nav-item" onclick="nav('briefing',this)">
+        <i class="ti ti-sun"></i>Daily Briefing
+      </div>
+    </div>
+
+    <div class="sidebar-label">Workspaces</div>
+    <div class="sidebar-section">
+      <div class="nav-item" onclick="showNotif('Switched to MOA+')">
+        <i class="ti ti-briefcase"></i>MOA+
+      </div>
+      <div class="nav-item" onclick="showNotif('Switched to One Life')">
+        <i class="ti ti-building-community"></i>One Life
+      </div>
+      <div class="nav-item" onclick="showNotif('Switched to Corporate Training')">
+        <i class="ti ti-certificate"></i>Corporate Training
+      </div>
+      <div class="nav-item" onclick="showNotif('Switched to Personal Brand')">
+        <i class="ti ti-user-star"></i>Personal Brand
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="ws-modal" id="ws-modal">
+        <div class="ws-option active" onclick="selectWs('All Companies','#C68B2A',this)">
+          <div class="ws-color" style="background:#C68B2A"></div>All Companies
+        </div>
+        <div class="ws-option" onclick="selectWs('MOA+','#1A5CA8',this)">
+          <div class="ws-color" style="background:#1A5CA8"></div>MOA+
+        </div>
+        <div class="ws-option" onclick="selectWs('One Life','#2D7D4E',this)">
+          <div class="ws-color" style="background:#2D7D4E"></div>One Life
+        </div>
+        <div class="ws-option" onclick="selectWs('Corporate Training','#6B3FA0',this)">
+          <div class="ws-color" style="background:#6B3FA0"></div>Corporate Training
+        </div>
+        <div class="ws-option" onclick="selectWs('Personal Brand','#B83030',this)">
+          <div class="ws-color" style="background:#B83030"></div>Personal Brand
+        </div>
+      </div>
+      <div class="ws-switcher" id="ws-switcher">
+        <div class="ws-dot" id="ws-dot"></div>
+        <div class="ws-name" id="ws-name">All Companies</div>
+        <i class="ti ti-chevron-up" style="font-size:14px;color:#5A5850"></i>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;padding:0 2px">
+        <div style="width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0">EV</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:#C8C5BC;font-weight:500">Evelyn</div>
+          <div style="font-size:10px;color:#5A5850">CEO · All Companies</div>
+        </div>
+        <i class="ti ti-settings" style="font-size:15px;color:#5A5850;cursor:pointer" title="Settings"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════ MAIN ═══════════════════════════════ -->
+  <div class="main">
+    <div class="topbar">
+      <button class="icon-btn menu-btn" id="menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <i class="ti ti-menu-2"></i>
+      </button>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-input" id="top-search" placeholder="Search meetings, docs, tasks, decisions…" aria-label="Universal search">
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" aria-label="Notifications" onclick="showNotif('No new notifications')">
+          <i class="ti ti-bell"></i>
+        </button>
+        <button class="icon-btn" aria-label="Calendar" onclick="showNotif('Calendar coming in Phase 2')">
+          <i class="ti ti-calendar"></i>
+        </button>
+        <button class="avatar" aria-label="Profile">EV</button>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+
+      <!-- ─────────────── DASHBOARD ─────────────── -->
+      <div class="page active" id="page-dashboard">
+        <div class="greeting-banner">
+          <div>
+            <div class="greeting-date" id="today-date">Thursday, June 26 · Good morning</div>
+            <div class="greeting-h">Good morning, Evelyn.</div>
+            <p class="greeting-p">You have 3 decisions waiting, 4 tasks at risk, and 2 meetings before noon. Here's what matters today.</p>
+          </div>
+          <button class="briefing-open-btn" onclick="nav('briefing',document.querySelectorAll('.nav-item')[5])">
+            <i class="ti ti-sun"></i>Open Briefing
+          </button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Today's priorities</div>
+            <div class="stat-value" style="color:var(--accent-text)">5</div>
+            <div class="stat-sub">Only you can do these</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Delegatable now</div>
+            <div class="stat-value" style="color:var(--info)">7</div>
+            <div class="stat-sub">Ready to assign</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tasks at risk</div>
+            <div class="stat-value" style="color:var(--danger)">4</div>
+            <div class="stat-sub">Need action today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Decisions waiting</div>
+            <div class="stat-value" style="color:var(--warning)">3</div>
+            <div class="stat-sub">Blocking the team</div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-star"></i>Today's priorities</div>
+              <span class="card-action" onclick="nav('delegate',document.querySelectorAll('.nav-item')[2])">View all →</span>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
+              <div class="task-body">
+                <div class="task-title">Approve Lonza workshop proposal</div>
+                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due today</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
+              <div class="task-body">
+                <div class="task-title">Review Q3 MOA+ pricing deck</div>
+                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due today</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check done" onclick="toggleCheck(this)" role="checkbox" aria-checked="true" tabindex="0"><i class="ti ti-check"></i></div>
+              <div class="task-body">
+                <div class="task-title done">Reply to One Haven partnership email</div>
+                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Done</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
+              <div class="task-body">
+                <div class="task-title">Record podcast intro script sign-off</div>
+                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due tomorrow</span></div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
+              <div class="task-body">
+                <div class="task-title">Decide on October workshop dates</div>
+                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Blocking team</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-clock"></i>Today's meetings</div>
+              <span class="card-action">Calendar →</span>
+            </div>
+            <div class="meeting-item"><div class="meeting-time">9:00</div><div><div class="meeting-name">Lonza Workshop Kickoff</div><div class="meeting-co">Corporate Training · 60 min</div></div></div>
+            <div class="meeting-item"><div class="meeting-time">11:30</div><div><div class="meeting-name">MOA+ Client Review</div><div class="meeting-co">MOA+ · 45 min</div></div></div>
+            <div class="meeting-item"><div class="meeting-time">14:00</div><div><div class="meeting-name">One Life Venue Planning</div><div class="meeting-co">One Life · 30 min</div></div></div>
+            <div class="meeting-item"><div class="meeting-time">16:00</div><div><div class="meeting-name">Team Sync — Operations</div><div class="meeting-co">Internal · 30 min</div></div></div>
+            <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
+              <div style="font-size:12px;color:var(--text-muted)">Deep work available</div>
+              <div style="font-size:13px;color:var(--text-primary);margin:4px 0">~2.5 hours today</div>
+              <div class="deep-work-bar"><div class="deep-work-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-arrows-transfer-down"></i>Delegatable now</div>
+              <span class="card-action" onclick="nav('delegate',document.querySelectorAll('.nav-item')[2])">Generate plan →</span>
+            </div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Compile Lonza meeting notes</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>30 min</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Draft podcast guest outreach email</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>45 min</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Organize Drive — One Life folder</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>60 min</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Create workshop registration page</div><div class="task-meta"><span class="task-tag tag-team">Team</span><span>2 hrs</span></div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="ti ti-alert-triangle"></i>At risk</div>
+              <span class="card-action" onclick="nav('rescue',document.querySelectorAll('.nav-item')[3])">Rescue →</span>
+            </div>
+            <div class="task-item"><div class="task-body"><div class="task-title">One Haven sponsorship proposal</div><div class="task-meta"><span class="task-tag tag-risk">5 days overdue</span><span>No owner</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">MOA+ onboarding deck update</div><div class="task-meta"><span class="task-tag tag-risk">3 days overdue</span><span>Blocked</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Corporate Training Q4 calendar</div><div class="task-meta"><span class="task-tag tag-risk">2 days overdue</span><span>No deadline</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">Personal brand content plan</div><div class="task-meta"><span class="task-tag tag-risk">Delayed × 3</span><span>Waiting CEO</span></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── CEO BRAIN ─────────────── -->
+      <div class="page" id="page-brain">
+        <div style="margin-bottom:20px">
+          <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">CEO Brain</h1>
+          <p style="font-size:13px;color:var(--text-secondary)">Ask anything. Your meetings, documents, decisions, and SOPs — all in one place.</p>
+        </div>
+        <div class="brain-search-wrap">
+          <i class="ti ti-brain brain-search-icon"></i>
+          <input class="brain-search-input" id="brain-input" placeholder="Prepare me for my Lonza meeting…">
+          <button class="brain-search-btn" onclick="brainSearch()">
+            <i class="ti ti-sparkles"></i><span>Ask Evelyn</span>
+          </button>
+        </div>
+        <div class="suggestions-row">
+          <div class="suggestion-chip" onclick="setQuery('Prepare me for my Lonza meeting')">Prepare for Lonza meeting</div>
+          <div class="suggestion-chip" onclick="setQuery('Find One Life venue pricing')">One Life venue pricing</div>
+          <div class="suggestion-chip" onclick="setQuery('What decisions were made yesterday?')">Decisions from yesterday</div>
+          <div class="suggestion-chip" onclick="setQuery('Show every discussion about podcasts')">Podcast discussions</div>
+          <div class="suggestion-chip" onclick="setQuery('What is MOA pricing?')">MOA+ pricing</div>
+          <div class="suggestion-chip" onclick="setQuery('Summarize One Haven meetings')">One Haven meetings</div>
+        </div>
+        <div class="source-tags">
+          <div class="source-tag active" onclick="filterSource(this)"><i class="ti ti-layout-grid"></i>All sources</div>
+          <div class="source-tag" onclick="filterSource(this)"><i class="ti ti-microphone"></i>Meetings</div>
+          <div class="source-tag" onclick="filterSource(this)"><i class="ti ti-file-text"></i>Documents</div>
+          <div class="source-tag" onclick="filterSource(this)"><i class="ti ti-list-check"></i>SOPs</div>
+          <div class="source-tag" onclick="filterSource(this)"><i class="ti ti-presentation"></i>Presentations</div>
+          <div class="source-tag" onclick="filterSource(this)"><i class="ti ti-file-invoice"></i>Proposals</div>
+        </div>
+        <div id="brain-results">
+          <div class="ai-response" id="ai-response" style="display:none">
+            <div class="ai-response-label"><i class="ti ti-sparkles"></i>Evelyn's answer</div>
+            <div class="ai-response-text" id="ai-text"></div>
+            <div class="ai-actions">
+              <button class="ai-action-btn" onclick="showNotif('Opening delegation view…')">Delegation plan</button>
+              <button class="ai-action-btn" onclick="showNotif('Risks surfaced')">Risks</button>
+              <button class="ai-action-btn" onclick="showNotif('Decisions listed')">Decisions needed</button>
+              <button class="ai-action-btn" onclick="showNotif('Next actions ready')">Next actions</button>
+            </div>
+          </div>
+          <div id="result-cards"></div>
+          <div id="brain-empty" style="text-align:center;padding:60px 20px;color:var(--text-muted)">
+            <i class="ti ti-brain" style="font-size:36px;display:block;margin-bottom:10px"></i>
+            <p style="font-size:13px">Type a question or choose a suggestion to search your knowledge base.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── DELEGATE ─────────────── -->
+      <div class="page" id="page-delegate">
+        <div style="margin-bottom:16px">
+          <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">AI Delegate Assistant</h1>
+          <p style="font-size:13px;color:var(--text-secondary)">Your AI Chief of Staff identifies tasks you should delegate today.</p>
+        </div>
+        <button class="del-gen-btn" id="del-gen-btn" onclick="generateDelegation()">
+          <i class="ti ti-sparkles"></i>Generate Today's Delegation Plan
+        </button>
+        <div id="del-output" style="display:none">
+          <div class="del-cols">
+            <!-- CEO ONLY -->
+            <div>
+              <div class="del-col-header del-col-ceo"><i class="ti ti-crown"></i>CEO only</div>
+              <div class="del-card">
+                <div class="del-task">
+                  <div class="del-task-title">Lonza proposal approval</div>
+                  <div class="del-task-desc">Review and sign off on the workshop structure and pricing before the 9am meeting.</div>
+                  <div class="del-task-meta"><span class="badge badge-urgent">Due today</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">Q3 strategy decision</div>
+                  <div class="del-task-desc">Decide on MOA+ service expansion vs. consolidation. Team is waiting to proceed.</div>
+                  <div class="del-task-meta"><span class="badge badge-urgent">Blocking team</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">October workshop pricing</div>
+                  <div class="del-task-desc">Set final pricing for public workshops. Marketing cannot launch until confirmed.</div>
+                  <div class="del-task-meta"><span class="badge badge-soon">Due Friday</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- VA -->
+            <div>
+              <div class="del-col-header del-col-va"><i class="ti ti-user"></i>VA / assistant</div>
+              <div class="del-card">
+                <div class="del-task">
+                  <div class="del-task-title">Compile Lonza meeting notes</div>
+                  <div class="del-task-desc">Summarize action items from the transcript and send to all attendees by EOD.</div>
+                  <div class="del-task-meta"><span class="badge badge-soon">30 min · Today</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">Podcast guest research</div>
+                  <div class="del-task-desc">Research 5 potential guests matching leadership + women in business criteria.</div>
+                  <div class="del-task-meta"><span class="badge badge-ok">2 hrs · This week</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">Drive folder organization</div>
+                  <div class="del-task-desc">Restructure the One Life Drive folder per the naming convention SOP.</div>
+                  <div class="del-task-meta"><span class="badge badge-ok">60 min · This week</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">Follow-up emails — MOA meeting</div>
+                  <div class="del-task-desc">Draft and send follow-ups based on yesterday's MOA+ client review notes.</div>
+                  <div class="del-task-meta"><span class="badge badge-soon">45 min · Today</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- TEAM -->
+            <div>
+              <div class="del-col-header del-col-team"><i class="ti ti-users"></i>Team</div>
+              <div class="del-card">
+                <div class="del-task">
+                  <div class="del-task-title">Workshop registration page</div>
+                  <div class="del-task-desc">Build the event page with pricing, schedule, and payment for October dates.</div>
+                  <div class="del-task-meta"><span class="badge badge-soon">2 hrs · By Wed</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">Social media content — October</div>
+                  <div class="del-task-desc">Create 8 posts promoting upcoming workshops across LinkedIn and Instagram.</div>
+                  <div class="del-task-meta"><span class="badge badge-ok">3 hrs · This week</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
+                </div>
+                <div class="del-task">
+                  <div class="del-task-title">One Life venue availability</div>
+                  <div class="del-task-desc">Confirm Q4 booking windows and send availability list to corporate clients.</div>
+                  <div class="del-task-meta"><span class="badge badge-ok">1 hr · By Fri</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="del-info">
+            <i class="ti ti-info-circle"></i>
+            <div>Delegating all VA and team tasks frees approximately <strong>7 hours</strong> this week. Your estimated deep work time increases from 2.5 to 9.5 hours.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── RESCUE ─────────────── -->
+      <div class="page" id="page-rescue">
+        <div style="margin-bottom:16px">
+          <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">Task Rescue Center</h1>
+          <p style="font-size:13px;color:var(--text-secondary)">Tasks that are blocked, overdue, or at risk of falling through.</p>
+        </div>
+        <div class="rescue-stat-row">
+          <div class="rescue-stat" style="background:var(--danger-bg);color:var(--danger)"><i class="ti ti-flame"></i>High risk: 2</div>
+          <div class="rescue-stat" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-alert-triangle"></i>Medium risk: 2</div>
+          <div class="rescue-stat" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i>Resolved this week: 3</div>
+        </div>
+        <div class="rescue-item">
+          <div class="risk-dot risk-high"></div>
+          <div class="rescue-body">
+            <div class="rescue-title">One Haven sponsorship proposal</div>
+            <div class="rescue-meta"><span>No owner assigned</span><span>5 days overdue</span><span>Corporate Training</span></div>
+            <div class="rescue-suggestion">Assign to VA immediately. All source materials are in the Lonza folder. Expected output: 2-page PDF proposal by Friday.</div>
+            <div class="rescue-actions">
+              <button class="small-btn primary" onclick="showNotif('Task assigned to VA')">Assign to VA</button>
+              <button class="small-btn" onclick="showNotif('Reminder set')">Set reminder</button>
+              <button class="small-btn" onclick="showNotif('Marked as resolved')">Resolve</button>
+            </div>
+          </div>
+        </div>
+        <div class="rescue-item">
+          <div class="risk-dot risk-high"></div>
+          <div class="rescue-body">
+            <div class="rescue-title">MOA+ onboarding deck update</div>
+            <div class="rescue-meta"><span>Blocked — waiting for CEO decision</span><span>3 days overdue</span><span>MOA+</span></div>
+            <div class="rescue-suggestion">CEO needs to confirm the new service tiers before the team can update slides 4–8. Decision required today to unblock the team.</div>
+            <div class="rescue-actions">
+              <button class="small-btn primary" onclick="showNotif('Added to decisions list')">Add to decisions</button>
+              <button class="small-btn" onclick="showNotif('Reminder set for 2pm')">Remind me at 2pm</button>
+            </div>
+          </div>
+        </div>
+        <div class="rescue-item">
+          <div class="risk-dot risk-med"></div>
+          <div class="rescue-body">
+            <div class="rescue-title">Corporate Training Q4 calendar</div>
+            <div class="rescue-meta"><span>No deadline set</span><span>2 days delayed</span><span>Corporate Training</span></div>
+            <div class="rescue-suggestion">Set a deadline and assign to Operations team. Q4 planning window closes July 15 — risk of missing corporate client bookings.</div>
+            <div class="rescue-actions">
+              <button class="small-btn primary" onclick="showNotif('Deadline set: July 12')">Set deadline</button>
+              <button class="small-btn" onclick="showNotif('Delegation sent')">Delegate</button>
+            </div>
+          </div>
+        </div>
+        <div class="rescue-item">
+          <div class="risk-dot risk-med"></div>
+          <div class="rescue-body">
+            <div class="rescue-title">Personal brand content plan</div>
+            <div class="rescue-meta"><span>Delayed 3× in a row</span><span>Waiting for CEO</span><span>Personal Brand</span></div>
+            <div class="rescue-suggestion">This task has been postponed three times. Schedule a 30-minute block this week or delegate the first draft to the content team.</div>
+            <div class="rescue-actions">
+              <button class="small-btn primary" onclick="showNotif('Scheduled: Friday 10am')">Schedule 30 min</button>
+              <button class="small-btn" onclick="showNotif('First draft delegated to team')">Delegate first draft</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── MEETINGS ─────────────── -->
+      <div class="page" id="page-meetings">
+        <div style="margin-bottom:16px">
+          <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">Meeting Intelligence</h1>
+          <p style="font-size:13px;color:var(--text-secondary)">Upload a transcript and Evelyn extracts decisions, actions, risks, and next steps.</p>
+        </div>
+        <div class="upload-zone" id="upload-zone" onclick="simulateUpload()" role="button" tabindex="0">
+          <i class="ti ti-upload"></i>
+          <p>Drop a meeting transcript here</p>
+          <span>Supports .txt, .docx, .pdf, .vtt — or paste text directly</span>
+        </div>
+        <div class="section-heading"><i class="ti ti-clock-hour-4"></i>Recent meetings</div>
+        <div class="processed-meeting">
+          <div class="meeting-banner">
+            <div>
+              <div class="meeting-banner-title">Lonza Workshop Kickoff</div>
+              <div class="meeting-banner-sub">June 24, 2026 · 63 minutes · 4 attendees</div>
+            </div>
+            <div class="meeting-banner-badge">Processed</div>
+          </div>
+          <div class="meeting-sections">
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-check"></i>Key decisions</div>
+              <div class="meeting-point">Workshop dates confirmed: Oct 14–15</div>
+              <div class="meeting-point">In-person format approved for Lonza HQ</div>
+              <div class="meeting-point">Budget ceiling set at $12,000</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-list-check"></i>Action items</div>
+              <div class="meeting-point">Evelyn: Approve proposal by June 26</div>
+              <div class="meeting-point">VA: Send agenda template by June 28</div>
+              <div class="meeting-point">Team: Finalize facilitator lineup</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-alert-circle"></i>Risks flagged</div>
+              <div class="meeting-point">Catering vendor not yet confirmed</div>
+              <div class="meeting-point">No backup facilitator identified</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-arrow-right"></i>Next steps</div>
+              <div class="meeting-point">Follow-up meeting: July 3, 10am</div>
+              <div class="meeting-point">Proposal signed and returned</div>
+              <div class="meeting-point">Guest list from Lonza HR by July 1</div>
+            </div>
+          </div>
+        </div>
+        <div class="processed-meeting">
+          <div class="meeting-banner">
+            <div>
+              <div class="meeting-banner-title">One Life Venue Planning</div>
+              <div class="meeting-banner-sub">June 22, 2026 · 42 minutes · 3 attendees</div>
+            </div>
+            <div class="meeting-banner-badge">Processed</div>
+          </div>
+          <div class="meeting-sections">
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-check"></i>Key decisions</div>
+              <div class="meeting-point">Venue pricing updated to $950/half-day</div>
+              <div class="meeting-point">New weekend packages approved</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-list-check"></i>Action items</div>
+              <div class="meeting-point">Update website pricing page</div>
+              <div class="meeting-point">Send new rate card to existing clients</div>
+              <div class="meeting-point">Review and update deposit policy</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-alert-circle"></i>Risks flagged</div>
+              <div class="meeting-point">3 bookings still on old rate — renewal needed</div>
+            </div>
+            <div class="meeting-section">
+              <div class="meeting-section-title"><i class="ti ti-arrow-right"></i>Next steps</div>
+              <div class="meeting-point">Venue calendar updated by June 28</div>
+              <div class="meeting-point">Client email blast this week</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────────── DAILY BRIEFING ─────────────── -->
+      <div class="page" id="page-briefing">
+        <div class="briefing-header">
+          <div>
+            <div class="briefing-greeting">Good morning, Evelyn.</div>
+            <div class="briefing-sub">Thursday, June 26 · Here's your executive briefing.</div>
+          </div>
+          <button class="briefing-refresh-btn" id="briefing-btn" onclick="generateBriefing()">
+            <i class="ti ti-refresh"></i>Refresh briefing
+          </button>
+        </div>
+
+        <div class="briefing-section">
+          <div class="briefing-section-title"><i class="ti ti-star"></i>Today's top priorities</div>
+          <div class="priority-item">
+            <div class="priority-num">1</div>
+            <div><div class="priority-text">Approve the Lonza workshop proposal</div><div class="priority-reason">Meeting is at 9am — approval needed before you walk in.</div></div>
+          </div>
+          <div class="priority-item">
+            <div class="priority-num">2</div>
+            <div><div class="priority-text">Decide on MOA+ service tiers</div><div class="priority-reason">Team blocked for 3 days. Deck update cannot proceed without this.</div></div>
+          </div>
+          <div class="priority-item">
+            <div class="priority-num">3</div>
+            <div><div class="priority-text">Set October workshop pricing</div><div class="priority-reason">Marketing needs this by noon to launch the registration page.</div></div>
+          </div>
+        </div>
+
+        <div class="briefing-section">
+          <div class="briefing-section-title"><i class="ti ti-calendar"></i>Suggested schedule</div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">8:00</div></div><div><div class="schedule-title">Review Lonza proposal (15 min)</div><div class="schedule-note">Deep work · Do before the meeting</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">9:00</div></div><div><div class="schedule-title">Lonza Workshop Kickoff</div><div class="schedule-note">Meeting · Corporate Training</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">10:30</div></div><div><div class="schedule-title">MOA+ service tier decision (30 min)</div><div class="schedule-note">Deep work · Blocks team and clients</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">11:30</div></div><div><div class="schedule-title">MOA+ Client Review</div><div class="schedule-note">Meeting · MOA+</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">14:00</div></div><div><div class="schedule-title">One Life Venue Planning</div><div class="schedule-note">Meeting · One Life</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">15:00</div></div><div><div class="schedule-title">Delegation review (30 min)</div><div class="schedule-note">Deep work · Send today's VA tasks</div></div></div>
+          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">16:00</div></div><div><div class="schedule-title">Team Sync — Operations</div><div class="schedule-note">Meeting · Internal</div></div></div>
+        </div>
+
+        <div class="cols-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-trending-up"></i>High-risk projects</div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">One Haven sponsorship</div><div class="task-meta"><span class="task-tag tag-risk">5 days overdue</span></div></div></div>
+            <div class="task-item"><div class="task-body"><div class="task-title">MOA+ onboarding deck</div><div class="task-meta"><span class="task-tag tag-risk">CEO blocking</span></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title"><i class="ti ti-clock"></i>Deep work availability</div></div>
+            <div style="font-size:22px;font-weight:500;margin:4px 0">~2.5 hrs</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">Protected time between meetings</div>
+            <div class="deep-work-bar"><div class="deep-work-fill"></div></div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Delegation frees 7 more hours this week</div>
+          </div>
+        </div>
+
+        <div class="briefing-section">
+          <div class="briefing-section-title"><i class="ti ti-message-circle"></i>Follow-ups needed</div>
+          <div class="priority-item">
+            <div class="priority-num" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-clock" style="font-size:9px"></i></div>
+            <div><div class="priority-text">Reply to One Haven partnership inquiry</div><div class="priority-reason">Received June 23 — 3 days without a response</div></div>
+          </div>
+          <div class="priority-item">
+            <div class="priority-num" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-clock" style="font-size:9px"></i></div>
+            <div><div class="priority-text">Confirm July podcast guest availability</div><div class="priority-reason">Invite sent June 20 — no reply yet</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ─── Navigation ───────────────────────────────────────────────
+const pages = ['dashboard','brain','delegate','rescue','meetings','briefing'];
+
+function nav(id, el) {
+  pages.forEach(p => {
+    document.getElementById('page-' + p).classList.remove('active');
+  });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.removeAttribute('aria-current');
+  });
+  if (el) { el.classList.add('active'); el.setAttribute('aria-current','page'); }
+  document.getElementById('ws-modal').classList.remove('open');
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  document.getElementById('content').scrollTop = 0;
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ─── Notifications ────────────────────────────────────────────
+let notifTimer;
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  document.getElementById('notif-text').textContent = msg;
+  n.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(() => n.classList.remove('show'), 2400);
+}
+
+// ─── Workspace switcher ───────────────────────────────────────
+document.getElementById('ws-switcher').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('ws-modal').classList.toggle('open');
+});
+document.getElementById('ws-modal').addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => document.getElementById('ws-modal').classList.remove('open'));
+
+function selectWs(name, color, el) {
+  document.querySelectorAll('.ws-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ws-name').textContent = name;
+  document.getElementById('ws-dot').style.background = color;
+  document.getElementById('ws-modal').classList.remove('open');
+  showNotif('Switched to ' + name);
+}
+
+// ─── Task checkboxes ──────────────────────────────────────────
+function toggleCheck(el) {
+  const isDone = el.classList.contains('done');
+  const title = el.closest('.task-item').querySelector('.task-title');
+  if (isDone) {
+    el.classList.remove('done');
+    el.innerHTML = '';
+    el.setAttribute('aria-checked','false');
+    title.classList.remove('done');
+  } else {
+    el.classList.add('done');
+    el.innerHTML = '<i class="ti ti-check"></i>';
+    el.setAttribute('aria-checked','true');
+    title.classList.add('done');
+    showNotif('Task marked complete');
+  }
+}
+
+// Keyboard support for checkboxes
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('task-check')) {
+    e.preventDefault();
+    toggleCheck(e.target);
+  }
+});
+
+// ─── Source tag filter ────────────────────────────────────────
+function filterSource(el) {
+  document.querySelectorAll('.source-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── CEO Brain ────────────────────────────────────────────────
+const brainData = {
+  'lonza': {
+    answer: 'Lonza workshop is confirmed for Oct 14–15 at their HQ. Budget ceiling: $12,000. Key decision pending: proposal approval required before today\'s 9am meeting. Risks: catering vendor not confirmed, no backup facilitator identified. VA needs to send the agenda template by June 28.',
+    results: [
+      { type:'Meeting transcript', icon:'ti-microphone', title:'Lonza Workshop Kickoff — June 24', snippet:'Decisions: Oct 14–15 dates confirmed, in-person format at Lonza HQ, $12,000 budget. Action: Evelyn to approve proposal by June 26.' },
+      { type:'Document', icon:'ti-file-text', title:'Lonza Workshop Proposal v2.pdf', snippet:'Full workshop structure, agenda, pricing breakdown, and facilitator profiles for the Oct 2026 leadership program.' },
+    ]
+  },
+  'one life': {
+    answer: 'One Life venue pricing was updated in the June 22 planning meeting: half-day rate increased from $800 to $950. Weekend packages approved. 3 existing clients are still on the old rate and need renewal conversations. The website pricing page has not yet been updated.',
+    results: [
+      { type:'Meeting transcript', icon:'ti-microphone', title:'One Life Venue Planning — June 22', snippet:'Venue pricing updated to $950/half-day. Weekend packages approved. Website update pending. 3 bookings at old rate need renewal.' },
+      { type:'Document', icon:'ti-file-invoice', title:'One Life Rate Card 2026.pdf', snippet:'Updated pricing schedule including venue hire, catering packages, AV options, and corporate day-rate bundles.' },
+    ]
+  },
+  'one haven': {
+    answer: 'One Haven partnership inquiry received June 23 — 3 days without a response. Sponsorship proposal is 5 days overdue with no owner assigned. All source materials are in the Lonza folder. VA can draft the 2-page proposal by Friday if assigned today.',
+    results: [
+      { type:'Task', icon:'ti-list-check', title:'One Haven sponsorship proposal', snippet:'No owner. 5 days overdue. Risk: high. Source materials available in Lonza folder. Suggested action: assign to VA immediately.' },
+    ]
+  },
+  'podcast': {
+    answer: 'Podcast has been mentioned across 4 recent meetings. Key themes: guest criteria (leadership + women in business), target audience alignment with Personal Brand, July launch timeline. VA research task is delegatable — 5 guests needed. No host script has been approved yet.',
+    results: [
+      { type:'Meeting transcript', icon:'ti-microphone', title:'Personal Brand Strategy — June 18', snippet:'Podcast launch target: July 2026. Guest criteria: women in leadership, entrepreneurship, education. Host intro script pending approval.' },
+    ]
+  },
+  'moa': {
+    answer: 'MOA+ pricing is currently under review — the Q3 deck update is blocked pending CEO decision on service tiers. Current offering spans Creative Services, Digital Media, and Strategy Retainers. Slides 4–8 cannot be updated until the service tier decision is made today.',
+    results: [
+      { type:'Document', icon:'ti-file-text', title:'MOA+ Pricing Deck Q3 2026', snippet:'Service tier breakdown, retainer options, and project-based pricing. Slides 4–8 blocked pending CEO decision on tier restructure.' },
+    ]
+  },
+};
+
+function setQuery(q) {
+  document.getElementById('brain-input').value = q;
+  brainSearch();
+}
+
+function brainSearch() {
+  const q = document.getElementById('brain-input').value.toLowerCase().trim();
+  if (!q) return;
+  const aiEl = document.getElementById('ai-response');
+  const textEl = document.getElementById('ai-text');
+  const cardsEl = document.getElementById('result-cards');
+  const emptyEl = document.getElementById('brain-empty');
+
+  let match = null;
+  for (const key in brainData) {
+    if (q.includes(key)) { match = brainData[key]; break; }
+  }
+  if (!match) {
+    match = {
+      answer: 'I searched across your meetings, documents, and SOPs. Upload more transcripts and connect your Google Drive to get richer results. Try terms like "Lonza", "One Life pricing", or "podcast".',
+      results: []
+    };
+  }
+  emptyEl.style.display = 'none';
+  aiEl.style.display = 'block';
+  textEl.textContent = match.answer;
+  cardsEl.innerHTML = match.results.map(r => `
+    <div class="result-card">
+      <div class="result-type"><i class="ti ${r.icon}"></i>${r.type}</div>
+      <div class="result-title">${r.title}</div>
+      <div class="result-snippet">${r.snippet}</div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('brain-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') brainSearch();
+});
+
+// Universal top search → routes to CEO Brain
+document.getElementById('top-search').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const v = e.target.value.trim();
+    if (v.length > 1) {
+      nav('brain', document.querySelectorAll('.nav-item')[1]);
+      document.getElementById('brain-input').value = v;
+      brainSearch();
+      e.target.value = '';
+    }
+  }
+});
+
+// ─── Delegate ─────────────────────────────────────────────────
+function generateDelegation() {
+  const btn = document.getElementById('del-gen-btn');
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Analyzing your tasks…';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('del-output').style.display = 'block';
+    btn.innerHTML = '<i class="ti ti-check"></i>Plan generated — 10 tasks organized';
+    btn.style.background = '#1A4A1E';
+    showNotif('Delegation plan ready');
+  }, 1200);
+}
+
+// ─── Daily Briefing ───────────────────────────────────────────
+function generateBriefing() {
+  const btn = document.getElementById('briefing-btn');
+  btn.innerHTML = '<i class="ti ti-loader-2"></i>Refreshing…';
+  btn.disabled = true;
+  setTimeout(() => {
+    showNotif('Briefing refreshed');
+    btn.innerHTML = '<i class="ti ti-check"></i>Up to date';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="ti ti-refresh"></i>Refresh briefing';
+      btn.disabled = false;
+    }, 2200);
+  }, 1400);
+}
+
+// ─── Meeting upload ───────────────────────────────────────────
+let uploadDone = false;
+function simulateUpload() {
+  if (uploadDone) return;
+  const zone = document.getElementById('upload-zone');
+  zone.innerHTML = '<i class="ti ti-loader-2"></i><p>Processing transcript…</p><span>Extracting decisions, actions, risks, next steps</span>';
+  setTimeout(() => {
+    uploadDone = true;
+    zone.innerHTML = '<i class="ti ti-check" style="color:var(--success)"></i><p style="color:var(--success);font-weight:500">Transcript processed and saved to CEO Brain</p><span>Scroll down to see the intelligence summary</span>';
+    zone.style.borderColor = 'var(--success)';
+    zone.style.background = 'var(--success-bg)';
+    showNotif('Meeting added to CEO Brain');
+  }, 1600);
+}
+
+// ─── Live date ────────────────────────────────────────────────
+(function() {
+  const d = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const hour = d.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const el = document.getElementById('today-date');
+  if (el) el.textContent = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()} · ${greeting}`;
+})();
+
+// ─── Responsive menu button ────────────────────────────────────
+function checkMobile() {
+  const btn = document.getElementById('menu-btn');
+  if (window.innerWidth <= 768) {
+    btn.style.display = 'flex';
+  } else {
+    btn.style.display = 'none';
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+checkMobile();
+window.addEventListener('resize', checkMobile);
+</script>
+</body>
+</html>
