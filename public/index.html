@@ -327,16 +327,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
     <div class="sidebar-label">Workspaces</div>
     <div class="sidebar-section">
       <div class="nav-item" onclick="showNotif('Switched to MOA+')">
-        <i class="ti ti-briefcase"></i>MOA+
+        <i class="ti ti-briefcase"></i>Company 1
       </div>
-      <div class="nav-item" onclick="showNotif('Switched to One Life')">
-        <i class="ti ti-building-community"></i>One Life
+      <div class="nav-item" onclick="showNotif('Switched to Company 2')">
+        <i class="ti ti-building-community"></i>Company 2
       </div>
-      <div class="nav-item" onclick="showNotif('Switched to Corporate Training')">
-        <i class="ti ti-certificate"></i>Corporate Training
+      <div class="nav-item" onclick="showNotif('Switched to Company 3')">
+        <i class="ti ti-certificate"></i>Company 3
       </div>
-      <div class="nav-item" onclick="showNotif('Switched to Personal Brand')">
-        <i class="ti ti-user-star"></i>Personal Brand
+      <div class="nav-item" onclick="showNotif('Switched to Company 4')">
+        <i class="ti ti-user-star"></i>Company 4
       </div>
     </div>
 
@@ -348,14 +348,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         <div class="ws-option" onclick="selectWs('MOA+','#1A5CA8',this)">
           <div class="ws-color" style="background:#1A5CA8"></div>MOA+
         </div>
-        <div class="ws-option" onclick="selectWs('One Life','#2D7D4E',this)">
-          <div class="ws-color" style="background:#2D7D4E"></div>One Life
+        <div class="ws-option" onclick="selectWs('Company 2','#2D7D4E',this)">
+          <div class="ws-color" style="background:#2D7D4E"></div
         </div>
-        <div class="ws-option" onclick="selectWs('Corporate Training','#6B3FA0',this)">
-          <div class="ws-color" style="background:#6B3FA0"></div>Corporate Training
+        <div class="ws-option" onclick="selectWs('Company 3','#6B3FA0',this)">
+          <div class="ws-color" style="background:#6B3FA0"></div>Company 3
         </div>
-        <div class="ws-option" onclick="selectWs('Personal Brand','#B83030',this)">
-          <div class="ws-color" style="background:#B83030"></div>Personal Brand
+        <div class="ws-option" onclick="selectWs('Company 4','#B83030',this)">
+          <div class="ws-color" style="background:#B83030"></div>Company 4
         </div>
       </div>
       <div class="ws-switcher" id="ws-switcher">
@@ -406,119 +406,74 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
       <div class="page active" id="page-dashboard">
         <div class="greeting-banner">
           <div>
-            <div class="greeting-date" id="today-date">Thursday, June 26 · Good morning</div>
-            <div class="greeting-h">Good morning, Evelyn.</div>
-            <p class="greeting-p">You have 3 decisions waiting, 4 tasks at risk, and 2 meetings before noon. Here's what matters today.</p>
+            <div class="greeting-date" id="today-date"></div>
+            <div class="greeting-h" id="dash-greeting">Good morning, Evelyn.</div>
+            <p class="greeting-p" id="dash-summary">Open My Day to add your tasks and see your priorities here.</p>
           </div>
           <button class="briefing-open-btn" onclick="nav('briefing',document.querySelectorAll('.nav-item')[5])">
             <i class="ti ti-sun"></i>Open Briefing
           </button>
         </div>
-
         <div class="stats-row">
           <div class="stat-card">
             <div class="stat-label">Today's priorities</div>
-            <div class="stat-value" style="color:var(--accent-text)">5</div>
-            <div class="stat-sub">Only you can do these</div>
+            <div class="stat-value" style="color:var(--accent-text)" id="stat-ceo-count">0</div>
+            <div class="stat-sub">CEO only tasks</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Delegatable now</div>
-            <div class="stat-value" style="color:var(--info)">7</div>
-            <div class="stat-sub">Ready to assign</div>
+            <div class="stat-value" style="color:var(--info)" id="stat-delegate-count">0</div>
+            <div class="stat-sub">VA + Team tasks</div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Tasks at risk</div>
-            <div class="stat-value" style="color:var(--danger)">4</div>
-            <div class="stat-sub">Need action today</div>
+            <div class="stat-value" style="color:var(--danger)" id="stat-risk-count">0</div>
+            <div class="stat-sub">Flagged in rescue</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Decisions waiting</div>
-            <div class="stat-value" style="color:var(--warning)">3</div>
-            <div class="stat-sub">Blocking the team</div>
+            <div class="stat-label">Completed today</div>
+            <div class="stat-value" style="color:var(--success)" id="stat-done-count">0</div>
+            <div class="stat-sub">Tasks marked done</div>
           </div>
         </div>
-
         <div class="cols-2">
           <div class="card">
             <div class="card-header">
               <div class="card-title"><i class="ti ti-star"></i>Today's priorities</div>
-              <span class="card-action" onclick="nav('delegate',document.querySelectorAll('.nav-item')[2])">View all →</span>
+              <span class="card-action" onclick="openTodo()">+ Add task</span>
             </div>
-            <div class="task-item">
-              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
-              <div class="task-body">
-                <div class="task-title">Approve Lonza workshop proposal</div>
-                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due today</span></div>
-              </div>
-            </div>
-            <div class="task-item">
-              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
-              <div class="task-body">
-                <div class="task-title">Review Q3 MOA+ pricing deck</div>
-                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due today</span></div>
-              </div>
-            </div>
-            <div class="task-item">
-              <div class="task-check done" onclick="toggleCheck(this)" role="checkbox" aria-checked="true" tabindex="0"><i class="ti ti-check"></i></div>
-              <div class="task-body">
-                <div class="task-title done">Reply to One Haven partnership email</div>
-                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Done</span></div>
-              </div>
-            </div>
-            <div class="task-item">
-              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
-              <div class="task-body">
-                <div class="task-title">Record podcast intro script sign-off</div>
-                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Due tomorrow</span></div>
-              </div>
-            </div>
-            <div class="task-item">
-              <div class="task-check" onclick="toggleCheck(this)" role="checkbox" aria-checked="false" tabindex="0"></div>
-              <div class="task-body">
-                <div class="task-title">Decide on October workshop dates</div>
-                <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span><span>Blocking team</span></div>
-              </div>
+            <div id="dash-priorities-list">
+              <div class="empty-dash-state"><i class="ti ti-checkbox" style="font-size:24px;display:block;margin-bottom:6px;color:var(--text-muted)"></i><p style="font-size:12px;color:var(--text-muted)">No CEO tasks yet. Open My Day to add priorities.</p></div>
             </div>
           </div>
-
           <div class="card">
             <div class="card-header">
               <div class="card-title"><i class="ti ti-clock"></i>Today's meetings</div>
-              <span class="card-action">Calendar →</span>
+              <span class="card-action" onclick="openMeetingQuickAdd()">+ Add</span>
             </div>
-            <div class="meeting-item"><div class="meeting-time">9:00</div><div><div class="meeting-name">Lonza Workshop Kickoff</div><div class="meeting-co">Corporate Training · 60 min</div></div></div>
-            <div class="meeting-item"><div class="meeting-time">11:30</div><div><div class="meeting-name">MOA+ Client Review</div><div class="meeting-co">MOA+ · 45 min</div></div></div>
-            <div class="meeting-item"><div class="meeting-time">14:00</div><div><div class="meeting-name">One Life Venue Planning</div><div class="meeting-co">One Life · 30 min</div></div></div>
-            <div class="meeting-item"><div class="meeting-time">16:00</div><div><div class="meeting-name">Team Sync — Operations</div><div class="meeting-co">Internal · 30 min</div></div></div>
-            <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border)">
-              <div style="font-size:12px;color:var(--text-muted)">Deep work available</div>
-              <div style="font-size:13px;color:var(--text-primary);margin:4px 0">~2.5 hours today</div>
-              <div class="deep-work-bar"><div class="deep-work-fill"></div></div>
+            <div id="dash-meetings-list">
+              <div class="empty-dash-state"><i class="ti ti-calendar" style="font-size:24px;display:block;margin-bottom:6px;color:var(--text-muted)"></i><p style="font-size:12px;color:var(--text-muted)">No meetings added yet. Click + Add to add today's meetings.</p></div>
             </div>
           </div>
         </div>
-
         <div class="cols-2">
           <div class="card">
             <div class="card-header">
               <div class="card-title"><i class="ti ti-arrows-transfer-down"></i>Delegatable now</div>
-              <span class="card-action" onclick="nav('delegate',document.querySelectorAll('.nav-item')[2])">Generate plan →</span>
+              <span class="card-action" onclick="openTodo()">+ Add task</span>
             </div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Compile Lonza meeting notes</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>30 min</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Draft podcast guest outreach email</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>45 min</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Organize Drive — One Life folder</div><div class="task-meta"><span class="task-tag tag-va">VA</span><span>60 min</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Create workshop registration page</div><div class="task-meta"><span class="task-tag tag-team">Team</span><span>2 hrs</span></div></div></div>
+            <div id="dash-delegate-list">
+              <div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No VA or Team tasks yet.</p></div>
+            </div>
           </div>
-
           <div class="card">
             <div class="card-header">
               <div class="card-title"><i class="ti ti-alert-triangle"></i>At risk</div>
-              <span class="card-action" onclick="nav('rescue',document.querySelectorAll('.nav-item')[3])">Rescue →</span>
+              <span class="card-action" onclick="nav('rescue',document.querySelectorAll('.nav-item')[3])">View rescue →</span>
             </div>
-            <div class="task-item"><div class="task-body"><div class="task-title">One Haven sponsorship proposal</div><div class="task-meta"><span class="task-tag tag-risk">5 days overdue</span><span>No owner</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">MOA+ onboarding deck update</div><div class="task-meta"><span class="task-tag tag-risk">3 days overdue</span><span>Blocked</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Corporate Training Q4 calendar</div><div class="task-meta"><span class="task-tag tag-risk">2 days overdue</span><span>No deadline</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">Personal brand content plan</div><div class="task-meta"><span class="task-tag tag-risk">Delayed × 3</span><span>Waiting CEO</span></div></div></div>
+            <div id="dash-risk-list">
+              <div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No at-risk items. Add them in Task Rescue.</p></div>
+            </div>
           </div>
         </div>
       </div>
@@ -531,18 +486,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         </div>
         <div class="brain-search-wrap">
           <i class="ti ti-brain brain-search-icon"></i>
-          <input class="brain-search-input" id="brain-input" placeholder="Prepare me for my Lonza meeting…">
+          <input class="brain-search-input" id="brain-input" placeholder="Ask anything — e.g. What did we decide in the last meeting?">
           <button class="brain-search-btn" onclick="brainSearch()">
             <i class="ti ti-sparkles"></i><span>Ask Evelyn</span>
           </button>
         </div>
         <div class="suggestions-row">
-          <div class="suggestion-chip" onclick="setQuery('Prepare me for my Lonza meeting')">Prepare for Lonza meeting</div>
-          <div class="suggestion-chip" onclick="setQuery('Find One Life venue pricing')">One Life venue pricing</div>
-          <div class="suggestion-chip" onclick="setQuery('What decisions were made yesterday?')">Decisions from yesterday</div>
-          <div class="suggestion-chip" onclick="setQuery('Show every discussion about podcasts')">Podcast discussions</div>
-          <div class="suggestion-chip" onclick="setQuery('What is MOA pricing?')">MOA+ pricing</div>
-          <div class="suggestion-chip" onclick="setQuery('Summarize One Haven meetings')">One Haven meetings</div>
+          <div class="suggestion-chip" onclick="setQuery('What should I focus on today?')">What should I focus on today?</div>
+          <div class="suggestion-chip" onclick="setQuery('What are my pending decisions?')">Pending decisions</div>
+          <div class="suggestion-chip" onclick="setQuery('Summarise my recent meetings')">Summarise recent meetings</div>
+          <div class="suggestion-chip" onclick="setQuery('What should I delegate this week?')">What to delegate</div>
+          <div class="suggestion-chip" onclick="setQuery('What is at risk right now?')">What is at risk?</div>
+          <div class="suggestion-chip" onclick="setQuery('Give me my daily briefing')">Daily briefing</div>
         </div>
         <div class="source-tags">
           <div class="source-tag active" onclick="filterSource(this)"><i class="ti ti-layout-grid"></i>All sources</div>
@@ -581,79 +536,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
           <i class="ti ti-sparkles"></i>Generate Today's Delegation Plan
         </button>
         <div id="del-output" style="display:none">
-          <div class="del-cols">
-            <!-- CEO ONLY -->
-            <div>
-              <div class="del-col-header del-col-ceo"><i class="ti ti-crown"></i>CEO only</div>
-              <div class="del-card">
-                <div class="del-task">
-                  <div class="del-task-title">Lonza proposal approval</div>
-                  <div class="del-task-desc">Review and sign off on the workshop structure and pricing before the 9am meeting.</div>
-                  <div class="del-task-meta"><span class="badge badge-urgent">Due today</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">Q3 strategy decision</div>
-                  <div class="del-task-desc">Decide on MOA+ service expansion vs. consolidation. Team is waiting to proceed.</div>
-                  <div class="del-task-meta"><span class="badge badge-urgent">Blocking team</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">October workshop pricing</div>
-                  <div class="del-task-desc">Set final pricing for public workshops. Marketing cannot launch until confirmed.</div>
-                  <div class="del-task-meta"><span class="badge badge-soon">Due Friday</span><button class="del-send-btn" onclick="showNotif('Added to priorities')">Add to priorities</button></div>
-                </div>
-              </div>
-            </div>
-            <!-- VA -->
-            <div>
-              <div class="del-col-header del-col-va"><i class="ti ti-user"></i>VA / assistant</div>
-              <div class="del-card">
-                <div class="del-task">
-                  <div class="del-task-title">Compile Lonza meeting notes</div>
-                  <div class="del-task-desc">Summarize action items from the transcript and send to all attendees by EOD.</div>
-                  <div class="del-task-meta"><span class="badge badge-soon">30 min · Today</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">Podcast guest research</div>
-                  <div class="del-task-desc">Research 5 potential guests matching leadership + women in business criteria.</div>
-                  <div class="del-task-meta"><span class="badge badge-ok">2 hrs · This week</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">Drive folder organization</div>
-                  <div class="del-task-desc">Restructure the One Life Drive folder per the naming convention SOP.</div>
-                  <div class="del-task-meta"><span class="badge badge-ok">60 min · This week</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">Follow-up emails — MOA meeting</div>
-                  <div class="del-task-desc">Draft and send follow-ups based on yesterday's MOA+ client review notes.</div>
-                  <div class="del-task-meta"><span class="badge badge-soon">45 min · Today</span><button class="del-send-btn" onclick="showNotif('Sent to VA')">Send to VA</button></div>
-                </div>
-              </div>
-            </div>
-            <!-- TEAM -->
-            <div>
-              <div class="del-col-header del-col-team"><i class="ti ti-users"></i>Team</div>
-              <div class="del-card">
-                <div class="del-task">
-                  <div class="del-task-title">Workshop registration page</div>
-                  <div class="del-task-desc">Build the event page with pricing, schedule, and payment for October dates.</div>
-                  <div class="del-task-meta"><span class="badge badge-soon">2 hrs · By Wed</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">Social media content — October</div>
-                  <div class="del-task-desc">Create 8 posts promoting upcoming workshops across LinkedIn and Instagram.</div>
-                  <div class="del-task-meta"><span class="badge badge-ok">3 hrs · This week</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
-                </div>
-                <div class="del-task">
-                  <div class="del-task-title">One Life venue availability</div>
-                  <div class="del-task-desc">Confirm Q4 booking windows and send availability list to corporate clients.</div>
-                  <div class="del-task-meta"><span class="badge badge-ok">1 hr · By Fri</span><button class="del-send-btn" onclick="showNotif('Sent to team')">Send to team</button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="del-info">
+          <div id="del-ai-answer" style="background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:20px;font-size:13px;color:var(--text-primary);line-height:1.8;white-space:pre-wrap"></div>
+          <div class="del-info" style="margin-top:12px">
             <i class="ti ti-info-circle"></i>
-            <div>Delegating all VA and team tasks frees approximately <strong>7 hours</strong> this week. Your estimated deep work time increases from 2.5 to 9.5 hours.</div>
+            <div>Based on your current tasks in My Day. Add tasks to My Day first for the best delegation plan.</div>
           </div>
         </div>
       </div>
@@ -662,61 +548,34 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
       <div class="page" id="page-rescue">
         <div style="margin-bottom:16px">
           <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">Task Rescue Center</h1>
-          <p style="font-size:13px;color:var(--text-secondary)">Tasks that are blocked, overdue, or at risk of falling through.</p>
+          <p style="font-size:13px;color:var(--text-secondary)">Flag tasks that are blocked, overdue, or at risk. Your dashboard at-risk list pulls from here.</p>
         </div>
-        <div class="rescue-stat-row">
-          <div class="rescue-stat" style="background:var(--danger-bg);color:var(--danger)"><i class="ti ti-flame"></i>High risk: 2</div>
-          <div class="rescue-stat" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-alert-triangle"></i>Medium risk: 2</div>
-          <div class="rescue-stat" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i>Resolved this week: 3</div>
+        <div class="rescue-stat-row" id="rescue-stats-row">
+          <div class="rescue-stat" style="background:var(--danger-bg);color:var(--danger)"><i class="ti ti-flame"></i><span id="rescue-high-count">High risk: 0</span></div>
+          <div class="rescue-stat" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-alert-triangle"></i><span id="rescue-med-count">Medium risk: 0</span></div>
+          <div class="rescue-stat" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i><span id="rescue-resolved-count">Resolved: 0</span></div>
         </div>
-        <div class="rescue-item">
-          <div class="risk-dot risk-high"></div>
-          <div class="rescue-body">
-            <div class="rescue-title">One Haven sponsorship proposal</div>
-            <div class="rescue-meta"><span>No owner assigned</span><span>5 days overdue</span><span>Corporate Training</span></div>
-            <div class="rescue-suggestion">Assign to VA immediately. All source materials are in the Lonza folder. Expected output: 2-page PDF proposal by Friday.</div>
-            <div class="rescue-actions">
-              <button class="small-btn primary" onclick="showNotif('Task assigned to VA')">Assign to VA</button>
-              <button class="small-btn" onclick="showNotif('Reminder set')">Set reminder</button>
-              <button class="small-btn" onclick="showNotif('Marked as resolved')">Resolve</button>
+
+        <!-- Add rescue item form -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title"><i class="ti ti-plus-circle"></i>Add at-risk task</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input id="rescue-title-input" placeholder="Task name" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <input id="rescue-reason-input" placeholder="Why is it at risk? (e.g. No owner, Blocked, 3 days overdue)" style="flex:1;min-width:160px;height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+              <input id="rescue-company-input" placeholder="Company / project" style="width:160px;height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+              <select id="rescue-risk-input" style="height:36px;padding:0 10px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-secondary);background:var(--bg)">
+                <option value="high">High risk</option>
+                <option value="med">Medium risk</option>
+              </select>
             </div>
+            <textarea id="rescue-suggestion-input" placeholder="Suggested action (what should be done to rescue this?)" style="height:70px;padding:8px 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;resize:none;color:var(--text-primary);background:var(--bg);line-height:1.5"></textarea>
+            <button onclick="addRescueItem()" style="background:var(--sidebar-bg);color:#fff;border:none;padding:9px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-alert-triangle"></i>Add to rescue list</button>
           </div>
         </div>
-        <div class="rescue-item">
-          <div class="risk-dot risk-high"></div>
-          <div class="rescue-body">
-            <div class="rescue-title">MOA+ onboarding deck update</div>
-            <div class="rescue-meta"><span>Blocked — waiting for CEO decision</span><span>3 days overdue</span><span>MOA+</span></div>
-            <div class="rescue-suggestion">CEO needs to confirm the new service tiers before the team can update slides 4–8. Decision required today to unblock the team.</div>
-            <div class="rescue-actions">
-              <button class="small-btn primary" onclick="showNotif('Added to decisions list')">Add to decisions</button>
-              <button class="small-btn" onclick="showNotif('Reminder set for 2pm')">Remind me at 2pm</button>
-            </div>
-          </div>
-        </div>
-        <div class="rescue-item">
-          <div class="risk-dot risk-med"></div>
-          <div class="rescue-body">
-            <div class="rescue-title">Corporate Training Q4 calendar</div>
-            <div class="rescue-meta"><span>No deadline set</span><span>2 days delayed</span><span>Corporate Training</span></div>
-            <div class="rescue-suggestion">Set a deadline and assign to Operations team. Q4 planning window closes July 15 — risk of missing corporate client bookings.</div>
-            <div class="rescue-actions">
-              <button class="small-btn primary" onclick="showNotif('Deadline set: July 12')">Set deadline</button>
-              <button class="small-btn" onclick="showNotif('Delegation sent')">Delegate</button>
-            </div>
-          </div>
-        </div>
-        <div class="rescue-item">
-          <div class="risk-dot risk-med"></div>
-          <div class="rescue-body">
-            <div class="rescue-title">Personal brand content plan</div>
-            <div class="rescue-meta"><span>Delayed 3× in a row</span><span>Waiting for CEO</span><span>Personal Brand</span></div>
-            <div class="rescue-suggestion">This task has been postponed three times. Schedule a 30-minute block this week or delegate the first draft to the content team.</div>
-            <div class="rescue-actions">
-              <button class="small-btn primary" onclick="showNotif('Scheduled: Friday 10am')">Schedule 30 min</button>
-              <button class="small-btn" onclick="showNotif('First draft delegated to team')">Delegate first draft</button>
-            </div>
-          </div>
+
+        <div id="rescue-list">
+          <div class="empty-dash-state" style="padding:40px;text-align:center"><i class="ti ti-shield-check" style="font-size:28px;display:block;margin-bottom:8px;color:var(--success)"></i><p style="font-size:13px;color:var(--text-muted)">No at-risk tasks. Add one above when something needs rescuing.</p></div>
         </div>
       </div>
 
@@ -732,71 +591,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
           <span>Supports .txt, .docx, .pdf, .vtt — or paste text directly</span>
         </div>
         <div class="section-heading"><i class="ti ti-clock-hour-4"></i>Recent meetings</div>
-        <div class="processed-meeting">
-          <div class="meeting-banner">
-            <div>
-              <div class="meeting-banner-title">Lonza Workshop Kickoff</div>
-              <div class="meeting-banner-sub">June 24, 2026 · 63 minutes · 4 attendees</div>
-            </div>
-            <div class="meeting-banner-badge">Processed</div>
-          </div>
-          <div class="meeting-sections">
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-check"></i>Key decisions</div>
-              <div class="meeting-point">Workshop dates confirmed: Oct 14–15</div>
-              <div class="meeting-point">In-person format approved for Lonza HQ</div>
-              <div class="meeting-point">Budget ceiling set at $12,000</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-list-check"></i>Action items</div>
-              <div class="meeting-point">Evelyn: Approve proposal by June 26</div>
-              <div class="meeting-point">VA: Send agenda template by June 28</div>
-              <div class="meeting-point">Team: Finalize facilitator lineup</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-alert-circle"></i>Risks flagged</div>
-              <div class="meeting-point">Catering vendor not yet confirmed</div>
-              <div class="meeting-point">No backup facilitator identified</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-arrow-right"></i>Next steps</div>
-              <div class="meeting-point">Follow-up meeting: July 3, 10am</div>
-              <div class="meeting-point">Proposal signed and returned</div>
-              <div class="meeting-point">Guest list from Lonza HR by July 1</div>
-            </div>
-          </div>
-        </div>
-        <div class="processed-meeting">
-          <div class="meeting-banner">
-            <div>
-              <div class="meeting-banner-title">One Life Venue Planning</div>
-              <div class="meeting-banner-sub">June 22, 2026 · 42 minutes · 3 attendees</div>
-            </div>
-            <div class="meeting-banner-badge">Processed</div>
-          </div>
-          <div class="meeting-sections">
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-check"></i>Key decisions</div>
-              <div class="meeting-point">Venue pricing updated to $950/half-day</div>
-              <div class="meeting-point">New weekend packages approved</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-list-check"></i>Action items</div>
-              <div class="meeting-point">Update website pricing page</div>
-              <div class="meeting-point">Send new rate card to existing clients</div>
-              <div class="meeting-point">Review and update deposit policy</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-alert-circle"></i>Risks flagged</div>
-              <div class="meeting-point">3 bookings still on old rate — renewal needed</div>
-            </div>
-            <div class="meeting-section">
-              <div class="meeting-section-title"><i class="ti ti-arrow-right"></i>Next steps</div>
-              <div class="meeting-point">Venue calendar updated by June 28</div>
-              <div class="meeting-point">Client email blast this week</div>
-            </div>
-          </div>
-        </div>
+        <div id="saved-meetings-list"></div>
       </div>
 
       <!-- ─────────────── DAILY BRIEFING ─────────────── -->
@@ -804,65 +599,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         <div class="briefing-header">
           <div>
             <div class="briefing-greeting">Good morning, Evelyn.</div>
-            <div class="briefing-sub">Thursday, June 26 · Here's your executive briefing.</div>
+            <div class="briefing-sub" id="briefing-date-sub"></div>
           </div>
           <button class="briefing-refresh-btn" id="briefing-btn" onclick="generateBriefing()">
-            <i class="ti ti-refresh"></i>Refresh briefing
+            <i class="ti ti-sparkles"></i>Generate AI Briefing
           </button>
         </div>
-
-        <div class="briefing-section">
-          <div class="briefing-section-title"><i class="ti ti-star"></i>Today's top priorities</div>
-          <div class="priority-item">
-            <div class="priority-num">1</div>
-            <div><div class="priority-text">Approve the Lonza workshop proposal</div><div class="priority-reason">Meeting is at 9am — approval needed before you walk in.</div></div>
-          </div>
-          <div class="priority-item">
-            <div class="priority-num">2</div>
-            <div><div class="priority-text">Decide on MOA+ service tiers</div><div class="priority-reason">Team blocked for 3 days. Deck update cannot proceed without this.</div></div>
-          </div>
-          <div class="priority-item">
-            <div class="priority-num">3</div>
-            <div><div class="priority-text">Set October workshop pricing</div><div class="priority-reason">Marketing needs this by noon to launch the registration page.</div></div>
-          </div>
-        </div>
-
-        <div class="briefing-section">
-          <div class="briefing-section-title"><i class="ti ti-calendar"></i>Suggested schedule</div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">8:00</div></div><div><div class="schedule-title">Review Lonza proposal (15 min)</div><div class="schedule-note">Deep work · Do before the meeting</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">9:00</div></div><div><div class="schedule-title">Lonza Workshop Kickoff</div><div class="schedule-note">Meeting · Corporate Training</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">10:30</div></div><div><div class="schedule-title">MOA+ service tier decision (30 min)</div><div class="schedule-note">Deep work · Blocks team and clients</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">11:30</div></div><div><div class="schedule-title">MOA+ Client Review</div><div class="schedule-note">Meeting · MOA+</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">14:00</div></div><div><div class="schedule-title">One Life Venue Planning</div><div class="schedule-note">Meeting · One Life</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">15:00</div></div><div><div class="schedule-title">Delegation review (30 min)</div><div class="schedule-note">Deep work · Send today's VA tasks</div></div></div>
-          <div class="schedule-item"><div class="schedule-time-col"><div class="schedule-time">16:00</div></div><div><div class="schedule-title">Team Sync — Operations</div><div class="schedule-note">Meeting · Internal</div></div></div>
-        </div>
-
-        <div class="cols-2">
-          <div class="card">
-            <div class="card-header"><div class="card-title"><i class="ti ti-trending-up"></i>High-risk projects</div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">One Haven sponsorship</div><div class="task-meta"><span class="task-tag tag-risk">5 days overdue</span></div></div></div>
-            <div class="task-item"><div class="task-body"><div class="task-title">MOA+ onboarding deck</div><div class="task-meta"><span class="task-tag tag-risk">CEO blocking</span></div></div></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title"><i class="ti ti-clock"></i>Deep work availability</div></div>
-            <div style="font-size:22px;font-weight:500;margin:4px 0">~2.5 hrs</div>
-            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">Protected time between meetings</div>
-            <div class="deep-work-bar"><div class="deep-work-fill"></div></div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Delegation frees 7 more hours this week</div>
-          </div>
-        </div>
-
-        <div class="briefing-section">
-          <div class="briefing-section-title"><i class="ti ti-message-circle"></i>Follow-ups needed</div>
-          <div class="priority-item">
-            <div class="priority-num" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-clock" style="font-size:9px"></i></div>
-            <div><div class="priority-text">Reply to One Haven partnership inquiry</div><div class="priority-reason">Received June 23 — 3 days without a response</div></div>
-          </div>
-          <div class="priority-item">
-            <div class="priority-num" style="background:var(--warning-bg);color:var(--warning)"><i class="ti ti-clock" style="font-size:9px"></i></div>
-            <div><div class="priority-text">Confirm July podcast guest availability</div><div class="priority-reason">Invite sent June 20 — no reply yet</div></div>
-          </div>
+        <div id="briefing-ai-box" style="display:none;background:var(--accent-light);border:.5px solid #E8C97A;border-radius:var(--radius);padding:20px;margin-bottom:20px;font-size:13px;color:var(--text-primary);line-height:1.8"></div>
+        <div style="background:var(--card-bg);border:.5px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;color:var(--text-muted)">
+          <i class="ti ti-sparkles" style="font-size:28px;display:block;margin-bottom:8px;color:var(--accent)"></i>
+          <p style="font-size:13px;margin-bottom:4px;color:var(--text-primary);font-weight:500">Your AI briefing appears here every morning</p>
+          <p style="font-size:12px">Click "Generate AI Briefing" above. Claude will read your tasks, meetings, and knowledge base and write your personalised morning brief.</p>
         </div>
       </div>
 
@@ -871,39 +618,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         <div class="va-page-header">
           <div>
             <h1 style="font-size:18px;font-weight:500;margin-bottom:4px">VA Recommendations</h1>
-            <p style="font-size:13px;color:var(--text-secondary)">AI-generated task briefs your VA can action right now — with full context, instructions, and expected output.</p>
+            <p style="font-size:13px;color:var(--text-secondary)">Describe what you need done — AI generates a full brief your VA can act on immediately.</p>
           </div>
           <button class="va-generate-btn" id="va-gen-btn" onclick="generateVATasks()">
-            <i class="ti ti-sparkles"></i>Generate VA Brief
+            <i class="ti ti-sparkles"></i>AI: Generate from my tasks
           </button>
         </div>
 
-        <!-- Summary bar -->
         <div class="va-summary-bar">
-          <div class="va-summary-stat">
-            <div class="va-summary-num" id="va-stat-total">6</div>
-            <div class="va-summary-label">Tasks ready</div>
-          </div>
+          <div class="va-summary-stat"><div class="va-summary-num" id="va-stat-total">0</div><div class="va-summary-label">Tasks ready</div></div>
           <div class="va-summary-divider"></div>
-          <div class="va-summary-stat">
-            <div class="va-summary-num" style="color:var(--danger)" id="va-stat-urgent">2</div>
-            <div class="va-summary-label">Due today</div>
-          </div>
+          <div class="va-summary-stat"><div class="va-summary-num" style="color:var(--danger)" id="va-stat-urgent">0</div><div class="va-summary-label">Due today</div></div>
           <div class="va-summary-divider"></div>
-          <div class="va-summary-stat">
-            <div class="va-summary-num" style="color:var(--info)" id="va-stat-hrs">5.5</div>
-            <div class="va-summary-label">Est. hours</div>
-          </div>
-          <div class="va-summary-divider"></div>
-          <div class="va-summary-stat">
-            <div class="va-summary-num" style="color:var(--success)" id="va-stat-done">1</div>
-            <div class="va-summary-label">Completed</div>
-          </div>
+          <div class="va-summary-stat"><div class="va-summary-num" style="color:var(--success)" id="va-stat-done">0</div><div class="va-summary-label">Completed</div></div>
           <div style="flex:1"></div>
           <button class="va-copy-all-btn" onclick="copyAllBrief()"><i class="ti ti-copy"></i>Copy all briefs</button>
         </div>
 
-        <!-- Filter chips -->
         <div class="va-filter-row">
           <div class="va-chip active" onclick="vaFilter(this,'all')">All tasks</div>
           <div class="va-chip" onclick="vaFilter(this,'today')"><i class="ti ti-flame"></i>Due today</div>
@@ -913,249 +644,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
           <div class="va-chip" onclick="vaFilter(this,'content')"><i class="ti ti-pencil"></i>Content</div>
         </div>
 
-        <!-- Task cards -->
         <div id="va-task-list">
-
-          <div class="va-card" data-cat="comms" data-due="today">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:#E6F0FB;color:#1A5CA8"><i class="ti ti-mail"></i></div>
-                <div>
-                  <div class="va-card-title">Draft follow-up emails — MOA+ client review</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#E6F0FB;color:#1A5CA8">Comms</span>
-                    <span class="va-due-tag va-due-today"><i class="ti ti-flame"></i>Due today</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>45 min</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
-                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
-                <div class="va-brief-text">Write and send follow-up emails to the 3 clients who attended yesterday's MOA+ client review meeting. Each email should thank them for their time, summarise the key points discussed, and confirm the next steps agreed in the meeting.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
-                <div class="va-brief-text">Meeting transcript from June 25 MOA+ Client Review is saved in CEO Brain. Clients: TechNova Sdn Bhd (Sarah Lim), Pinnacle Group (James Tan), Harvest Digital (Rachel Ng). Tone: professional, warm, concise.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
-                <div class="va-brief-text">3 separate email drafts sent to Evelyn for approval before 3pm, or sent directly if Evelyn has pre-approved the template. CC Evelyn on all.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-alert-circle"></i>Important notes</div>
-                <div class="va-brief-text">Do not promise specific timelines that were not mentioned in the meeting. If unsure about any next step, leave a placeholder and flag for Evelyn to fill in.</div>
-              </div>
-              <div class="va-brief-actions">
-                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
-                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
-                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
-              </div>
-            </div>
+          <div style="text-align:center;padding:48px 20px;color:var(--text-muted)">
+            <i class="ti ti-user-check" style="font-size:32px;display:block;margin-bottom:10px"></i>
+            <p style="font-size:13px;margin-bottom:6px;color:var(--text-primary);font-weight:500">No VA tasks yet</p>
+            <p style="font-size:12px">Describe a task below and AI will write a full brief, or click "AI: Generate from my tasks" to auto-create briefs from your current task list.</p>
           </div>
-
-          <div class="va-card" data-cat="admin" data-due="today">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:#FBF3E3;color:#7A500D"><i class="ti ti-notes"></i></div>
-                <div>
-                  <div class="va-card-title">Compile Lonza workshop meeting notes</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#FBF3E3;color:#7A500D">Admin</span>
-                    <span class="va-due-tag va-due-today"><i class="ti ti-flame"></i>Due today</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>30 min</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
-                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
-                <div class="va-brief-text">Create a clean, formatted meeting summary from the Lonza Workshop Kickoff transcript (June 24). Extract key decisions, action items with owners and deadlines, and open risks. Format as a shareable PDF or Google Doc.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
-                <div class="va-brief-text">Transcript is in CEO Brain under "Lonza Workshop Kickoff — June 24". Attendees: Evelyn, Lonza HR lead (Maria Santos), workshop facilitator (David Koh), operations contact. Format: use the standard meeting notes template in the Shared Drive → Templates folder.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
-                <div class="va-brief-text">One-page meeting summary document sent to all attendees by 5pm today. Email subject: "Lonza Workshop Kickoff — Notes &amp; Next Steps (June 24)". BCC Evelyn.</div>
-              </div>
-              <div class="va-brief-actions">
-                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
-                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
-                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="va-card" data-cat="research" data-due="week">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:#EBF5EF;color:#1A5E38"><i class="ti ti-search"></i></div>
-                <div>
-                  <div class="va-card-title">Research 5 podcast guest candidates</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#EBF5EF;color:#1A5E38">Research</span>
-                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Friday</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>2 hrs</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
-                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
-                <div class="va-brief-text">Identify and profile 5 potential podcast guests for Evelyn's upcoming podcast. Focus on women in leadership, entrepreneurship, and education. For each, provide: name, current role, LinkedIn URL, why they'd be a great fit, and suggested episode angle.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
-                <div class="va-brief-text">Podcast target audience: ambitious women building businesses and careers in Southeast Asia. Guest criteria discussed in Personal Brand Strategy meeting (June 18) — notes in CEO Brain. Preferred profile: published author or speaker, 5,000+ LinkedIn followers, based in SEA or with SEA relevance.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
-                <div class="va-brief-text">A Google Sheet with 5 rows (one per guest) and columns: Name, Role, Company, LinkedIn, Why them, Episode angle, Contact email (if findable). Share link with Evelyn by Friday 5pm.</div>
-              </div>
-              <div class="va-brief-actions">
-                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
-                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
-                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="va-card" data-cat="admin" data-due="week">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:#F3F0FB;color:#4A35A0"><i class="ti ti-folder"></i></div>
-                <div>
-                  <div class="va-card-title">Reorganize One Life Google Drive folder</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#F3F0FB;color:#4A35A0">Admin</span>
-                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Friday</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>60 min</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
-                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
-                <div class="va-brief-text">Restructure the One Life folder in Google Drive following the approved naming convention SOP. Archive outdated files (anything older than Dec 2024 that is not a template or SOP). Create clearly labelled subfolders for: Clients, Events, Venue, Marketing, Finance, Proposals.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
-                <div class="va-brief-text">Drive folder: Shared Drive → One Life. Naming convention SOP is at Shared Drive → SOPs → "File Naming &amp; Folder Structure SOP v2". Do not delete anything — move to "_Archive (2024 and before)" subfolder. Flag any files you're unsure about.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
-                <div class="va-brief-text">Reorganised folder with a screenshot summary of the new structure sent to Evelyn via WhatsApp or email. Note any files flagged for her decision.</div>
-              </div>
-              <div class="va-brief-actions">
-                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
-                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
-                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="va-card" data-cat="content" data-due="week">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:#FBEAEA;color:#8A2020"><i class="ti ti-pencil"></i></div>
-                <div>
-                  <div class="va-card-title">Create October workshop social media posts</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#FBEAEA;color:#8A2020">Content</span>
-                    <span class="va-due-tag va-due-week"><i class="ti ti-calendar"></i>By Wednesday</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>90 min</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-status-btn" onclick="markVaDone(this)"><i class="ti ti-check"></i>Mark done</button>
-                <button class="va-copy-btn" onclick="copyBrief(this)" title="Copy brief"><i class="ti ti-copy"></i></button>
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What to do</div>
-                <div class="va-brief-text">Write 8 social media posts promoting Evelyn's October leadership workshops. Mix of announcement, testimonial, behind-the-scenes, and value-focused posts. 4 for LinkedIn (longer, professional), 4 for Instagram (shorter, punchy with emoji). Include a CTA and registration link placeholder in each.</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-file-text"></i>Context &amp; source material</div>
-                <div class="va-brief-text">Workshop details: Oct 14–15, leadership focus, in-person, targeted at corporate managers and team leads. Past post examples in Shared Drive → Marketing → Social Media → 2025 Archive. Evelyn's writing style guide is at Shared Drive → Brand → "Evelyn Voice &amp; Tone Guide".</div>
-              </div>
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-checkbox"></i>Expected output</div>
-                <div class="va-brief-text">8 ready-to-post captions in a Google Doc, labelled by platform and post number. Include suggested hashtags for each. Share for Evelyn's review by Wednesday noon. Do not post without approval.</div>
-              </div>
-              <div class="va-brief-actions">
-                <button class="va-brief-action" onclick="showNotif('Brief copied to clipboard')"><i class="ti ti-copy"></i>Copy brief</button>
-                <button class="va-brief-action" onclick="showNotif('Sent to VA inbox')"><i class="ti ti-send"></i>Send to VA</button>
-                <button class="va-brief-action" onclick="showNotif('Added to VA task list')"><i class="ti ti-plus"></i>Add to VA list</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="va-card va-card-done" data-cat="comms" data-due="done">
-            <div class="va-card-header">
-              <div class="va-card-left">
-                <div class="va-card-icon" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i></div>
-                <div>
-                  <div class="va-card-title" style="text-decoration:line-through;color:var(--text-muted)">Reply to One Haven partnership inquiry</div>
-                  <div class="va-card-meta">
-                    <span class="va-cat-tag" style="background:#E6F0FB;color:#1A5CA8">Comms</span>
-                    <span class="va-due-tag" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-check"></i>Completed</span>
-                    <span class="va-time-tag"><i class="ti ti-clock"></i>20 min</span>
-                  </div>
-                </div>
-              </div>
-              <div class="va-card-actions">
-                <button class="va-expand-btn" onclick="toggleVaCard(this)" aria-label="Expand"><i class="ti ti-chevron-down"></i></button>
-              </div>
-            </div>
-            <div class="va-card-body">
-              <div class="va-brief-section">
-                <div class="va-brief-label"><i class="ti ti-target"></i>What was done</div>
-                <div class="va-brief-text">Drafted and sent acknowledgment reply to One Haven's partnership inquiry received June 23. Confirmed Evelyn's interest and requested a 30-minute discovery call for early July. Completed June 26, 9:15am.</div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        <!-- Add custom VA task -->
         <div class="va-add-task-wrap">
-          <div class="va-add-task-header">
-            <i class="ti ti-plus-circle" style="color:var(--accent)"></i>
-            <span>Add a custom VA task</span>
-          </div>
+          <div class="va-add-task-header"><i class="ti ti-plus-circle" style="color:var(--accent)"></i><span>Add a VA task</span></div>
           <div class="va-add-task-row">
             <input class="va-add-input" id="va-add-input" placeholder="Describe what you want your VA to do…" maxlength="200">
-            <select class="va-add-cat-sel" id="va-add-cat" aria-label="Category">
+            <select class="va-add-cat-sel" id="va-add-cat">
               <option value="admin">Admin</option>
               <option value="comms">Comms</option>
               <option value="research">Research</option>
@@ -1164,7 +665,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
             <button class="va-add-submit" onclick="addVaTask()"><i class="ti ti-sparkles"></i>Generate brief</button>
           </div>
         </div>
-
       </div>
 
       <!-- ─────────────── FUN BREAK ─────────────── -->
@@ -1286,7 +786,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-primary);font
         <div class="card" style="margin-bottom:20px">
           <div class="card-header"><div class="card-title"><i class="ti ti-plus-circle"></i>Add knowledge entry</div></div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <input id="kb-title" placeholder="Title (e.g. MOA+ Pricing 2026, One Life Venue SOP)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+            <input id="kb-title" placeholder="Title (e.g. My Pricing 2026, Venue SOP, Client Onboarding)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
             <select id="kb-cat" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-secondary);background:var(--bg)">
               <option value="SOP">SOP / Process</option>
               <option value="Pricing">Pricing</option>
@@ -1608,7 +1108,7 @@ function openTranscriptModal() {
         <div style="font-size:15px;font-weight:500">Add meeting transcript</div>
         <button onclick="document.getElementById('transcript-modal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button>
       </div>
-      <input id="t-title" placeholder="Meeting title (e.g. MOA+ Client Review)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      <input id="t-title" placeholder="Meeting title (e.g. Team Meeting, Client Call)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
       <input id="t-date" type="date" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
       <textarea id="t-text" placeholder="Paste your meeting transcript or notes here…" style="height:180px;padding:10px 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;resize:vertical;color:var(--text-primary);background:var(--bg);line-height:1.6"></textarea>
       <button onclick="processTranscript()" style="background:var(--accent);color:#fff;border:none;padding:10px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px" id="t-submit-btn"><i class="ti ti-sparkles"></i>Process with AI</button>
@@ -1824,6 +1324,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMeetings();
   renderWins();
   renderKnowledge();
+  renderRescue();
+  renderDashboard();
 
   // patch the meetings upload zone to open modal
   const zone = document.getElementById('upload-zone');
@@ -1832,20 +1334,245 @@ document.addEventListener('DOMContentLoaded', () => {
     zone.innerHTML = '<i class="ti ti-upload"></i><p>Click to add a meeting transcript</p><span>Paste text from any meeting — AI will extract decisions, actions, risks, and next steps</span>';
   }
 
-  // replace static meetings list with saved-meetings-list container
-  const oldMeetings = document.querySelectorAll('.processed-meeting');
-  if (oldMeetings.length) {
-    const parent = oldMeetings[0].parentNode;
-    const div = document.createElement('div');
-    div.id = 'saved-meetings-list';
-    // remove old static cards
-    oldMeetings.forEach(el => el.remove());
-    parent.appendChild(div);
-    renderMeetings();
-  }
+  renderMeetings();
 });
 
-// ─── Live date ────────────────────────────────────────────────
+// ─── Dashboard — render from live data ───────────────────────
+function renderDashboard() {
+  const tasks = getTasks();
+  const rescue = getRescue();
+
+  const ceoTasks    = tasks.filter(t => t.cat === 'ceo' && !t.done);
+  const delegatable = tasks.filter(t => (t.cat === 'va' || t.cat === 'team') && !t.done);
+  const doneTasks   = tasks.filter(t => t.done);
+
+  document.getElementById('stat-ceo-count').textContent      = ceoTasks.length;
+  document.getElementById('stat-delegate-count').textContent = delegatable.length;
+  document.getElementById('stat-risk-count').textContent     = rescue.filter(r=>!r.resolved).length;
+  document.getElementById('stat-done-count').textContent     = doneTasks.length;
+
+  // update summary sentence
+  const pending = tasks.filter(t=>!t.done).length;
+  const riskCount = rescue.filter(r=>!r.resolved).length;
+  const meetingsToday = getDayMeetings();
+  document.getElementById('dash-summary').textContent =
+    `${pending} task${pending!==1?'s':''} pending${riskCount?' · '+riskCount+' at risk':''}${meetingsToday.length?' · '+meetingsToday.length+' meeting'+(meetingsToday.length!==1?'s':'')+' today':''}.`;
+
+  // priorities list
+  const priList = document.getElementById('dash-priorities-list');
+  if (priList) {
+    if (!ceoTasks.length) {
+      priList.innerHTML = '<div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No CEO tasks yet. Open My Day to add priorities.</p></div>';
+    } else {
+      priList.innerHTML = ceoTasks.slice(0,5).map(t => `
+        <div class="task-item">
+          <div class="task-check${t.done?' done':''}" onclick="quickToggleTodo(${t.id})" tabindex="0">${t.done?'<i class="ti ti-check"></i>':''}</div>
+          <div class="task-body">
+            <div class="task-title${t.done?' done':''}">${escD(t.title)}</div>
+            <div class="task-meta"><span class="task-tag tag-ceo">CEO only</span>${t.urgent?'<span style="color:var(--danger);font-size:10px;font-weight:600">URGENT</span>':''}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // delegatable list
+  const delList = document.getElementById('dash-delegate-list');
+  if (delList) {
+    if (!delegatable.length) {
+      delList.innerHTML = '<div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No VA or Team tasks yet.</p></div>';
+    } else {
+      delList.innerHTML = delegatable.slice(0,4).map(t => `
+        <div class="task-item">
+          <div class="task-body">
+            <div class="task-title">${escD(t.title)}</div>
+            <div class="task-meta"><span class="task-tag ${t.cat==='va'?'tag-va':'tag-team'}">${t.cat==='va'?'VA':'Team'}</span></div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  // meetings list
+  renderDashMeetings();
+
+  // risk list
+  const riskList = document.getElementById('dash-risk-list');
+  if (riskList) {
+    const items = rescue.filter(r=>!r.resolved).slice(0,4);
+    if (!items.length) {
+      riskList.innerHTML = '<div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No at-risk items. Add them in Task Rescue.</p></div>';
+    } else {
+      riskList.innerHTML = items.map(r => `
+        <div class="task-item">
+          <div class="task-body">
+            <div class="task-title">${escD(r.title)}</div>
+            <div class="task-meta"><span class="task-tag tag-risk">${escD(r.reason||'At risk')}</span>${r.company?`<span>${escD(r.company)}</span>`:''}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+function escD(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function quickToggleTodo(id) {
+  const t = todos.find(x => x.id === id);
+  if (t) { t.done = !t.done; saveTodosStore(); renderTodos(); renderDashboard(); }
+}
+
+// ─── Day Meetings CRUD ───────────────────────────────────────
+function getDayMeetings()       { try { return JSON.parse(localStorage.getItem('evelyn_day_meetings')||'[]'); } catch(e){return[];} }
+function saveDayMeetings(m)     { localStorage.setItem('evelyn_day_meetings', JSON.stringify(m)); }
+
+function renderDashMeetings() {
+  const list = document.getElementById('dash-meetings-list');
+  if (!list) return;
+  const meetings = getDayMeetings();
+  if (!meetings.length) {
+    list.innerHTML = '<div class="empty-dash-state"><p style="font-size:12px;color:var(--text-muted)">No meetings added yet. Click + Add above.</p></div>';
+    return;
+  }
+  list.innerHTML = meetings.sort((a,b)=>a.time.localeCompare(b.time)).map((m,i) => `
+    <div class="meeting-item">
+      <div class="meeting-time">${escD(m.time)}</div>
+      <div style="flex:1">
+        <div class="meeting-name">${escD(m.name)}</div>
+        <div class="meeting-co">${escD(m.company)}${m.duration?' · '+escD(m.duration):''}</div>
+      </div>
+      <button onclick="deleteDayMeeting(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;padding:2px 4px"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+function deleteDayMeeting(idx) {
+  const m = getDayMeetings(); m.splice(idx,1); saveDayMeetings(m); renderDashMeetings(); showNotif('Meeting removed');
+}
+
+function openMeetingQuickAdd() {
+  const existing = document.getElementById('meeting-quick-modal');
+  if (existing) { existing.style.display='flex'; return; }
+  const modal = document.createElement('div');
+  modal.id = 'meeting-quick-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--card-bg);border-radius:var(--radius);padding:24px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:500">Add today's meeting</div>
+        <button onclick="document.getElementById('meeting-quick-modal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">✕</button>
+      </div>
+      <input id="mq-name" placeholder="Meeting name" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      <div style="display:flex;gap:8px">
+        <input id="mq-time" type="time" style="flex:1;height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+        <input id="mq-company" placeholder="Company / project" style="flex:1;height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      </div>
+      <input id="mq-duration" placeholder="Duration (e.g. 30 min, 1 hr)" style="height:36px;padding:0 12px;border:.5px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);outline:none;color:var(--text-primary);background:var(--bg)">
+      <button onclick="saveMeetingQuick()" style="background:var(--accent);color:#fff;border:none;padding:10px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)">Add meeting</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function saveMeetingQuick() {
+  const name     = document.getElementById('mq-name').value.trim();
+  const time     = document.getElementById('mq-time').value;
+  const company  = document.getElementById('mq-company').value.trim();
+  const duration = document.getElementById('mq-duration').value.trim();
+  if (!name) { showNotif('Please enter a meeting name'); return; }
+  const meetings = getDayMeetings();
+  meetings.push({ name, time: time||'TBD', company: company||'', duration });
+  saveDayMeetings(meetings);
+  renderDashMeetings();
+  document.getElementById('meeting-quick-modal').style.display='none';
+  showNotif('Meeting added');
+}
+
+// ─── Rescue CRUD ─────────────────────────────────────────────
+function getRescue()        { try { return JSON.parse(localStorage.getItem('evelyn_rescue')||'[]'); } catch(e){return[];} }
+function saveRescue(r)      { localStorage.setItem('evelyn_rescue', JSON.stringify(r)); }
+
+function addRescueItem() {
+  const title      = document.getElementById('rescue-title-input').value.trim();
+  const reason     = document.getElementById('rescue-reason-input').value.trim();
+  const company    = document.getElementById('rescue-company-input').value.trim();
+  const risk       = document.getElementById('rescue-risk-input').value;
+  const suggestion = document.getElementById('rescue-suggestion-input').value.trim();
+  if (!title) { showNotif('Please enter a task name'); return; }
+  const rescue = getRescue();
+  rescue.unshift({ id:Date.now(), title, reason, company, risk, suggestion, resolved:false });
+  saveRescue(rescue);
+  document.getElementById('rescue-title-input').value = '';
+  document.getElementById('rescue-reason-input').value = '';
+  document.getElementById('rescue-company-input').value = '';
+  document.getElementById('rescue-suggestion-input').value = '';
+  renderRescue();
+  renderDashboard();
+  showNotif('Added to rescue list');
+}
+
+function resolveRescue(id) {
+  const rescue = getRescue();
+  const item = rescue.find(r=>r.id===id);
+  if (item) { item.resolved = true; saveRescue(rescue); renderRescue(); renderDashboard(); showNotif('Marked as resolved ✓'); }
+}
+
+function deleteRescue(id) {
+  const rescue = getRescue().filter(r=>r.id!==id);
+  saveRescue(rescue); renderRescue(); renderDashboard(); showNotif('Item deleted');
+}
+
+function renderRescue() {
+  const rescue = getRescue();
+  const list = document.getElementById('rescue-list');
+  if (!list) return;
+
+  const active   = rescue.filter(r=>!r.resolved);
+  const resolved = rescue.filter(r=>r.resolved);
+  const high     = active.filter(r=>r.risk==='high').length;
+  const med      = active.filter(r=>r.risk==='med').length;
+
+  const hEl = document.getElementById('rescue-high-count');
+  const mEl = document.getElementById('rescue-med-count');
+  const rEl = document.getElementById('rescue-resolved-count');
+  if (hEl) hEl.textContent = `High risk: ${high}`;
+  if (mEl) mEl.textContent = `Medium risk: ${med}`;
+  if (rEl) rEl.textContent = `Resolved: ${resolved.length}`;
+
+  if (!active.length && !resolved.length) {
+    list.innerHTML = '<div class="empty-dash-state" style="padding:40px;text-align:center"><i class="ti ti-shield-check" style="font-size:28px;display:block;margin-bottom:8px;color:var(--success)"></i><p style="font-size:13px;color:var(--text-muted)">No at-risk tasks. Add one above when something needs rescuing.</p></div>';
+    return;
+  }
+
+  list.innerHTML = [...active, ...resolved].map(r => `
+    <div class="rescue-item" style="${r.resolved?'opacity:.6':''}">
+      <div class="risk-dot ${r.resolved?'risk-low':r.risk==='high'?'risk-high':'risk-med'}"></div>
+      <div class="rescue-body">
+        <div class="rescue-title" style="${r.resolved?'text-decoration:line-through;color:var(--text-muted)':''}">${escD(r.title)}</div>
+        <div class="rescue-meta">
+          ${r.reason?`<span>${escD(r.reason)}</span>`:''}
+          ${r.company?`<span>${escD(r.company)}</span>`:''}
+          <span>${r.resolved?'Resolved':'Risk: '+r.risk}</span>
+        </div>
+        ${r.suggestion?`<div class="rescue-suggestion">${escD(r.suggestion)}</div>`:''}
+        ${!r.resolved?`
+        <div class="rescue-actions">
+          <button class="small-btn primary" onclick="resolveRescue(${r.id})"><i class="ti ti-check"></i>Resolve</button>
+          <button class="small-btn" onclick="deleteRescue(${r.id})"><i class="ti ti-trash"></i>Delete</button>
+        </div>`:`
+        <div class="rescue-actions">
+          <button class="small-btn" onclick="deleteRescue(${r.id})"><i class="ti ti-trash"></i>Remove</button>
+        </div>`}
+      </div>
+    </div>`).join('');
+}
+
+// ─── Briefing date subtitle ───────────────────────────────────
+(function setBriefingDate() {
+  const el = document.getElementById('briefing-date-sub');
+  if (!el) return;
+  const d = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  el.textContent = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()} · Here's your executive briefing.`;
+})();
+
+
 (function() {
   const d = new Date();
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -2728,11 +2455,14 @@ function renderTodos() {
   document.getElementById('todo-progress-pct').textContent = pct + '%';
   document.getElementById('todo-progress-fill').style.width = pct + '%';
 
-  // badge
+  // update badge
   const pending = todos.filter(x => !x.done).length;
   const badge = document.getElementById('todo-count-badge');
   badge.textContent = pending;
   badge.style.background = pending > 0 ? 'var(--accent)' : 'var(--success)';
+
+  // sync dashboard
+  renderDashboard();
 
   // footer stats
   document.getElementById('stat-urgent').textContent = todos.filter(x => x.urgent && !x.done).length + ' urgent';
